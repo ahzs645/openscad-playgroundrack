@@ -16,6 +16,7 @@ interface BrowserProject {
   type: 'scad' | 'static';
   image?: string;
   status?: 'ideas' | 'in-progress' | 'in-review' | 'completed';
+  hidden?: boolean;
 }
 
 type ViewMode = 'grid' | 'kanban';
@@ -200,10 +201,14 @@ function collectProjects(fs: FS): BrowserProject[] {
       type: projectType,
       image: imageData,
       status: projectJson.status,
+      hidden: projectJson.hidden === true,
     });
   }
 
-  return projects.sort((a, b) => a.title.localeCompare(b.title));
+  // Filter out hidden projects and sort by title
+  return projects
+    .filter(project => !project.hidden)
+    .sort((a, b) => a.title.localeCompare(b.title));
 }
 
 export function ProjectGalleryDialog({

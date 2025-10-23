@@ -11,6 +11,94 @@ The sections below retain the upstream documentation for reference and build ins
 
 ---
 
+## Quick Start
+
+### Installation and Running
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd openscad-playgroundrack
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Build libraries** (download WASM and OpenSCAD libraries)
+   ```bash
+   npm run build:libs
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm start
+   ```
+
+5. **Open your browser** to `http://localhost:4000/`
+
+### First Time Setup
+
+When you first run the application, you'll see a full-screen gallery landing page with all available models. Click any card to open that model in the viewer.
+
+## Usage
+
+### Accessing the Application
+
+- **Gallery Landing Page**: Visit `http://localhost:4000/` to see all available models
+- **Direct Model Loading**: Use `?model=<ModelName>` to load a specific model directly
+  - Example: `http://localhost:4000/?model=3D%20Rack%20SCAD`
+- **In-App Gallery**: Click the "Gallery" button in the top-right to browse models while using the app
+
+### Working with Models
+
+#### Opening a Model
+1. From the landing page, click any project card
+2. Or use the Gallery button inside the app
+3. Or navigate directly via URL parameter
+
+#### Editor Controls
+- **F5**: Quick preview (fast render)
+- **F6** or **Ctrl+Enter**: Full render (slower but complete)
+- **F7**: Export model
+
+#### View Modes
+- **Single Panel Mode**: Shows one panel at a time (Editor, Viewer, or Customizer)
+- **Side-by-Side Mode**: Shows multiple panels simultaneously
+- Toggle between modes using the settings menu (gear icon)
+
+### Configuration Options
+
+#### Environment Variables (`.env` file)
+
+Create a `.env` file in the root directory to configure the application:
+
+```env
+# Hide the code editor (viewer/customizer only mode)
+PLAYGROUND_EDITOR_ENABLED=false
+
+# Hide the "Show/Hide Editor" toggle button
+PLAYGROUND_EDITOR_TOGGLE=false
+
+# Enable Kanban board view in gallery
+PLAYGROUND_KANBAN_ENABLED=true
+```
+
+**Note**: After changing `.env`, restart the dev server or rebuild for changes to take effect.
+
+#### URL Query Parameters
+
+Override settings at runtime using URL parameters:
+- `?editor=off` - Disable the editor
+- `?editorToggle=off` - Hide the editor toggle button
+- `?model=ProjectName` - Load a specific model
+- `?customizer=open` - Open customizer panel by default
+
+Example: `http://localhost:4000/?model=Keyguard%20with%20Raised%20Tabs&editor=off`
+
+---
+
 [Open the Demo](https://ochafik.com/openscad2)
 
 <a href="https://ochafik.com/openscad2" target="_blank">
@@ -196,11 +284,75 @@ In addition to OpenSCAD projects, the gallery can showcase pre-rendered static 3
   "description": "A showcase of a pre-rendered 3D model",
   "category": "Showcase",
   "tags": ["static", "model"],
-  "author": "Your Name"
+  "author": "Your Name",
+  "hidden": false
 }
 ```
 
 4. Optionally, add a thumbnail image (`thumbnail.png`, `thumbnail.jpg`, etc.) for the gallery preview
+
+### Project.json Options
+
+All projects (both OpenSCAD and static models) support the following properties in `project.json`:
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `title` | string | No | Display name in the gallery (defaults to folder name) |
+| `entry` | string | Yes | Entry file (e.g., `main.scad` or `model.glb`) |
+| `type` | string | No | Set to `"static"` for pre-rendered models (defaults to `"scad"`) |
+| `description` | string | No | Project description shown in gallery card |
+| `category` | string | No | Category for filtering (e.g., "Organization", "Accessibility") |
+| `tags` | string[] | No | Tags for search and filtering |
+| `author` | string | No | Project author name |
+| `image` | string | No | Custom thumbnail filename (e.g., `"custom.png"`) |
+| `status` | string | No | Kanban status: `"ideas"`, `"in-progress"`, `"in-review"`, `"completed"` |
+| `hidden` | boolean | No | Set to `true` to hide project from gallery (default: `false`) |
+
+**Example: Hidden project**
+```json
+{
+  "title": "Work in Progress",
+  "entry": "prototype.scad",
+  "description": "Experimental design - not ready for showcase",
+  "hidden": true
+}
+```
+
+**Note**: Hidden projects can still be accessed directly via URL parameter (e.g., `?model=ProjectName`)
+
+### Managing Projects
+
+#### Adding a New Project
+
+1. Create a folder in the `Models` directory with your project name
+2. Add your model files (`.scad`, `.glb`, `.gltf`, etc.)
+3. Create a `project.json` file with at least a `title` and `entry` field
+4. Optionally add a thumbnail image
+5. Run `npm run build:libs` to rebuild the Models archive
+6. Restart your dev server or reload the page
+
+#### Hiding a Project
+
+To temporarily hide a project from the gallery without deleting it:
+
+1. Open the project's `project.json` file
+2. Add `"hidden": true`
+3. Restart the dev server or rebuild
+
+Example:
+```json
+{
+  "title": "My Project",
+  "entry": "main.scad",
+  "hidden": true
+}
+```
+
+#### Deleting a Project
+
+1. Delete the project folder from `Models/`
+2. Run `npm run build:libs` to rebuild
+3. Restart your dev server
 
 ### Supported Model Formats
 
@@ -240,3 +392,42 @@ PLAYGROUND_EDITOR_TOGGLE=false
 ```
 
 Query-string parameters still override everything at runtime: `?editor=off` and `?editorToggle=off` mirror the variables above, while `window.OPENSCAD_PLAYGROUND_CONFIG` remains available for custom embeds.
+
+## Troubleshooting
+
+### Gallery shows "No projects found"
+
+**Solution**: Run `npm run build:libs` to build the Models archive. The gallery loads projects from a zip file that needs to be built first.
+
+### Changes to .env file not taking effect
+
+**Solution**: Environment variables are injected at build time. After modifying `.env`, you must:
+- Restart the dev server: Stop (`Ctrl+C`) and run `npm start` again
+- Or rebuild: `npm run build`
+
+### Added a new project but it doesn't appear in gallery
+
+**Solutions**:
+1. Make sure `project.json` has at least `title` and `entry` fields
+2. Run `npm run build:libs` to rebuild the Models archive
+3. Refresh the browser or restart the dev server
+4. Check that `"hidden": true` is not set in the project.json
+
+### Static model appears as a blank screen
+
+**Solutions**:
+1. Verify the `entry` path in `project.json` matches your file name exactly
+2. Ensure `"type": "static"` is set in project.json
+3. Check browser console for errors
+4. Verify the model file format is supported (GLB, GLTF, STL, OBJ, PLY, OFF)
+
+### Editor or render button is hidden
+
+**Check**:
+- `.env` file for `PLAYGROUND_EDITOR_ENABLED=false`
+- URL parameters like `?editor=off`
+- For static models, the editor and render button are automatically hidden
+
+### Models not loading after deployment
+
+**Solution**: Update the `homepage` field in `package.json` to match your deployment URL before building.
