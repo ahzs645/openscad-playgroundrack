@@ -18,7 +18,8 @@ export default function Footer({style}: {style?: CSSProperties}) {
   if (!model) throw new Error('No model');
   const state = model.state;
   const editorEnabled = typeof model.isEditorEnabled === 'function' ? model.isEditorEnabled() : true;
-  
+  const isStaticProject = state.project?.type === 'static';
+
   const toast = useRef<Toast>(null);
 
   const severityByMarkerSeverity = new Map<monaco.MarkerSeverity, 'danger' | 'warning' | 'info'>([
@@ -53,17 +54,17 @@ export default function Footer({style}: {style?: CSSProperties}) {
         margin: '5px',
         ...(style ?? {})
     }}>
-      {state.output && !state.output.isPreview
+      {!isStaticProject && state.output && !state.output.isPreview
         ? (
             <ExportButton />
-        ) : state.previewing ? (
+        ) : !isStaticProject && state.previewing ? (
           <Button
             icon="pi pi-bolt"
             disabled
             className="p-button-sm"
             label="Previewing..."
             />
-        ) : state.output && state.output.isPreview ? (
+        ) : !isStaticProject && state.output && state.output.isPreview ? (
             <Button
               icon="pi pi-bolt"
               onClick={() => model.render({isPreview: false, now: true})}

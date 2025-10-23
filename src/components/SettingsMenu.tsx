@@ -13,19 +13,20 @@ export default function SettingsMenu({className, style}: {className?: string, st
   if (!model) throw new Error('No model');
   const state = model.state;
   const editorEnabled = typeof model.isEditorEnabled === 'function' ? model.isEditorEnabled() : true;
+  const isStaticProject = state.project?.type === 'static';
 
   const settingsMenu = useRef<Menu>(null);
   const menuItems: MenuItem[] = [
-    {
+    ...(!isStaticProject ? [{
       label: state.view.layout.mode === 'multi'
         ? 'Switch to single panel mode'
         : 'Switch to side-by-side mode',
       icon: 'pi pi-table',
       command: () => model.changeLayout(state.view.layout.mode === 'multi' ? 'single' : 'multi'),
-    },
-    {
+    }] : []),
+    ...(!isStaticProject ? [{
       separator: true,
-    },
+    }] : []),
     {
       label: state.view.showAxes ? 'Hide axes' : 'Show axes',
       icon: 'pi pi-asterisk',
