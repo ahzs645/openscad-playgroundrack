@@ -193,15 +193,6 @@
                 "*.scad",
                 "LICENSE"
             ]
-        },
-        {
-            "name": "Models",
-            "localPath": "Models",
-            "zipExcludes": [
-                "__MACOSX/*",
-                "*.DS_Store",
-                "*/.DS_Store"
-            ]
         }
     ],
     "fonts": {

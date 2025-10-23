@@ -206,13 +206,28 @@ export class Model {
     this.setEditorVisible(!isVisible);
   }
 
-  openFile(path: string) {
+  async openFile(path: string) {
     // console.log(`openFile: ${path}`);
     const previousLayout = this.state.project?.previousLayout
       ? JSON.parse(JSON.stringify(this.state.project.previousLayout)) as State['view']['layout']
       : undefined;
     const previousLogsVisible = this.state.project?.previousLogsVisible;
     this.revokeStaticModel();
+
+    // Pre-fetch Models files via HTTP if needed
+    let preFetchedContent: string | null = null;
+    if (path.startsWith('/libraries/Models/')) {
+      const httpPath = path.replace('/libraries/Models/', '/Models/');
+      try {
+        const response = await fetch(httpPath);
+        if (response.ok) {
+          preFetchedContent = await response.text();
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch ${httpPath}:`, error);
+      }
+    }
+
     if (this.mutate(s => {
       if (s.params.activePath != path) {
         const readSource = (targetPath: string) => {
@@ -220,6 +235,11 @@ export class Model {
             const cached = this.state.params.sources.find(src => src.path === targetPath);
             return cached?.content ?? '';
           };
+
+          // If we pre-fetched the content, use it
+          if (preFetchedContent !== null && targetPath === path) {
+            return preFetchedContent;
+          }
 
           try {
             const bfs = this.fs as any;
@@ -274,7 +294,7 @@ export class Model {
         }
       }
     })) {
-      this.processSource();
+      await this.processSource();
     }
   }
 
@@ -625,25 +645,45 @@ export class Model {
     }
   }
 
-  openStaticProject(entryPath: string, options?: { projectId?: string, mimeType?: string }) {
-    const bfs = this.fs as any;
-    try {
-      if (!bfs.existsSync(entryPath)) {
-        throw new Error(`Static model not found: ${entryPath}`);
+  async openStaticProject(entryPath: string, options?: { projectId?: string, mimeType?: string }) {
+    let bytes: Uint8Array;
+
+    // Check if this is a Models file - fetch from HTTP instead of BrowserFS
+    if (entryPath.startsWith('/libraries/Models/')) {
+      const httpPath = entryPath.replace('/libraries/Models/', '/Models/');
+      try {
+        const response = await fetch(httpPath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch static model: ${httpPath}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        bytes = new Uint8Array(arrayBuffer);
+      } catch (error) {
+        console.error('Failed to fetch static model:', error);
+        return;
       }
-    } catch (error) {
-      console.error('Failed to open static project:', error);
-      return;
+    } else {
+      // Load from BrowserFS for non-Models files
+      const bfs = this.fs as any;
+      try {
+        if (!bfs.existsSync(entryPath)) {
+          throw new Error(`Static model not found: ${entryPath}`);
+        }
+      } catch (error) {
+        console.error('Failed to open static project:', error);
+        return;
+      }
+
+      let data: string | Uint8Array | ArrayBuffer;
+      try {
+        data = this.fs.readFileSync(entryPath) as any;
+      } catch (error) {
+        console.error('Failed to read static model:', error);
+        return;
+      }
+      bytes = toUint8Array(data);
     }
 
-    let data: string | Uint8Array | ArrayBuffer;
-    try {
-      data = this.fs.readFileSync(entryPath) as any;
-    } catch (error) {
-      console.error('Failed to read static model:', error);
-      return;
-    }
-    const bytes = toUint8Array(data);
     const mimeType = guessMimeType(entryPath, options?.mimeType);
     const objectUrl = URL.createObjectURL(new Blob([bytes], {type: mimeType}));
 

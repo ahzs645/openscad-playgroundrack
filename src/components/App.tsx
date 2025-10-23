@@ -187,72 +187,56 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
     // Handle model parameter from URL
     if (modelParam) {
       const modelPath = `/libraries/Models/${modelParam}`;
-      const bfs = fs as any;
-      let opened = false;
+      const httpModelPath = `/Models/${encodeURIComponent(modelParam)}`;
 
-      try {
-        // First, try to read project.json to get the entry point
-        const projectJsonPath = `${modelPath}/project.json`;
-        if (bfs.existsSync(projectJsonPath)) {
-          const projectData = JSON.parse(bfs.readFileSync(projectJsonPath, 'utf-8'));
-          const projectType = (projectData.type === 'static') ? 'static' : 'scad';
-          if (projectData.entry) {
-            const entryPath = `${modelPath}/${projectData.entry}`;
-            if (bfs.existsSync(entryPath)) {
+      (async () => {
+        let opened = false;
+
+        try {
+          // First, try to fetch project.json to get the entry point
+          const projectJsonResponse = await fetch(`${httpModelPath}/project.json`);
+          if (projectJsonResponse.ok) {
+            const projectData = await projectJsonResponse.json();
+            const projectType = (projectData.type === 'static') ? 'static' : 'scad';
+            if (projectData.entry) {
+              const entryPath = `${modelPath}/${projectData.entry}`;
               if (projectType === 'static') {
-                model.openStaticProject(entryPath, { projectId: modelParam });
+                await model.openStaticProject(entryPath, { projectId: modelParam });
                 opened = true;
               } else {
-                model.openFile(entryPath);
+                await model.openFile(entryPath);
                 opened = true;
               }
             }
           }
-        }
-      } catch (err) {
-        console.debug('Failed to read project.json:', err);
-      }
-
-      // Fallback: Try common file names
-      const tryPaths = [
-        `${modelPath}/main.scad`,
-        `${modelPath}/Main.scad`,
-        `${modelPath}/${modelParam}.scad`
-      ];
-
-      for (const path of tryPaths) {
-        try {
-          if (bfs.existsSync(path)) {
-            model.openFile(path);
-            opened = true;
-            break;
-          }
         } catch (err) {
-          console.debug(`Model file not found at ${path}`);
+          console.debug('Failed to fetch project.json:', err);
         }
-      }
 
-      // If still not found, scan directory for any .scad file
-      if (!opened) {
-        try {
-          const files = bfs.readdirSync(modelPath) as string[];
-          for (const file of files) {
-            if (file.toLowerCase().endsWith('.scad')) {
-              model.openFile(`${modelPath}/${file}`);
-              opened = true;
-              break;
+        // Fallback: Try common file names
+        if (!opened) {
+          const tryFiles = ['main.scad', 'Main.scad', `${modelParam}.scad`];
+          for (const file of tryFiles) {
+            try {
+              const response = await fetch(`${httpModelPath}/${encodeURIComponent(file)}`);
+              if (response.ok) {
+                await model.openFile(`${modelPath}/${file}`);
+                opened = true;
+                break;
+              }
+            } catch (err) {
+              console.debug(`Model file not found: ${file}`);
             }
           }
-        } catch (err) {
-          console.error(`Failed to load model ${modelParam}:`, err);
         }
-      }
 
-      if (opened) {
-        setGalleryVisible(false);
-        setGalleryVariant(defaultGalleryVariant);
-        return;
-      }
+        if (!opened) {
+          console.error(`Failed to load model ${modelParam}: No entry file found`);
+        } else {
+          setGalleryVisible(false);
+          setGalleryVariant(defaultGalleryVariant);
+        }
+      })();
     }
   }, [model, modelParam, fs, defaultGalleryVariant, showLanding]);
 

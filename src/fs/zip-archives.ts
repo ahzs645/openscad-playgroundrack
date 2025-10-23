@@ -22,9 +22,6 @@ export type ZipArchives = {
 
 export const zipArchives: ZipArchives = {
   'fonts': {},
-  'Models': {
-    description: 'Curated OpenSCAD projects and static 3D models (GLTF, GLB, etc.)',
-  },
   'openscad': {
     description: 'OpenSCAD',
     gitOrigin: {
@@ -230,3 +227,10 @@ export const deployedArchiveNames =
   Object.entries(zipArchives)
     .filter(([_, {deployed}]) => deployed == null || deployed)
     .map(([n]) => n);
+
+// Categorize archives for lazy loading
+// Critical archives are loaded immediately, others are loaded on-demand
+export const criticalArchives = ['fonts', 'openscad'];
+export const onDemandArchives = deployedArchiveNames.filter(
+  name => !criticalArchives.includes(name)
+);

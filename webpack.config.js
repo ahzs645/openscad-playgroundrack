@@ -98,7 +98,13 @@ const config = [
       path: path.resolve(__dirname, 'dist'),
     },
     devServer: {
-      static: path.join(__dirname, 'dist'),
+      static: [
+        path.join(__dirname, 'dist'),
+        {
+          directory: path.join(__dirname, 'Models'),
+          publicPath: '/Models',
+        }
+      ],
       compress: true,
       port: 4000,
       hot: false,
@@ -117,8 +123,6 @@ const config = [
         'process.env.PLAYGROUND_EDITOR_TOGGLE': JSON.stringify(process.env.PLAYGROUND_EDITOR_TOGGLE || ''),
         'process.env.PLAYGROUND_CUSTOMIZER_OPEN': JSON.stringify(process.env.PLAYGROUND_CUSTOMIZER_OPEN || ''),
         'process.env.PLAYGROUND_KANBAN_ENABLED': JSON.stringify(process.env.PLAYGROUND_KANBAN_ENABLED || ''),
-        'typeof process': JSON.stringify('undefined'),
-        'process': 'undefined',
       }),
       ...(process.env.NODE_ENV === 'production' ? [
         new WorkboxPlugin.GenerateSW({
@@ -164,6 +168,11 @@ const config = [
           {
             from: path.resolve(__dirname, 'src/wasm/openscad.wasm'),
             to: path.resolve(__dirname, 'dist'),
+          },
+          {
+            from: path.resolve(__dirname, 'Models'),
+            to: path.resolve(__dirname, 'dist/Models'),
+            toType: 'dir',
           },
         ],
       }),

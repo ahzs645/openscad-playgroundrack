@@ -22,6 +22,95 @@ interface BrowserProject {
 type ViewMode = 'grid' | 'kanban';
 
 const MODELS_BASE_PATH = '/libraries/Models';
+const MODELS_HTTP_BASE = '/Models';
+
+async function fetchJSON(url: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.warn(`Failed to fetch JSON from ${url}:`, error);
+    return null;
+  }
+}
+
+async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return undefined;
+
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    // Silently fail - 404s are expected when projects don't have thumbnails
+    return undefined;
+  }
+}
+
+async function collectProjectsHTTP(): Promise<BrowserProject[]> {
+  // Fetch the models index
+  const index = await fetchJSON(`${MODELS_HTTP_BASE}/index.json`);
+  if (!index || !Array.isArray(index.projects)) {
+    console.warn('Failed to load Models index');
+    return [];
+  }
+
+  const projects: BrowserProject[] = [];
+
+  for (const projectName of index.projects) {
+    const projectDir = `${MODELS_HTTP_BASE}/${encodeURIComponent(projectName)}`;
+    const projectJson = await fetchJSON(`${projectDir}/project.json`);
+
+    if (!projectJson) {
+      console.warn(`Failed to load project.json for ${projectName}`);
+      continue;
+    }
+
+    const projectType: 'scad' | 'static' = (projectJson.type === 'static') ? 'static' : 'scad';
+    const entry = typeof projectJson.entry === 'string' && projectJson.entry.length > 0
+      ? projectJson.entry
+      : (projectType === 'scad' ? 'main.scad' : null);
+
+    if (!entry) {
+      console.warn(`No entry file specified for project ${projectName}`);
+      continue;
+    }
+
+    const entryPath = `${MODELS_BASE_PATH}/${projectName}/${entry}`;
+
+    // Try to load thumbnail - only if specified in project.json to avoid 404 spam
+    let imageData: string | undefined;
+    const specifiedImage = projectJson.image || projectJson.thumbnail;
+    if (specifiedImage && typeof specifiedImage === 'string') {
+      const imageUrl = `${projectDir}/${encodeURIComponent(specifiedImage)}`;
+      imageData = await fetchImageAsDataUrl(imageUrl);
+    }
+
+    projects.push({
+      id: projectName,
+      title: projectJson.title ?? projectName,
+      description: projectJson.description,
+      category: projectJson.category,
+      tags: projectJson.tags,
+      author: projectJson.author,
+      entry,
+      entryPath,
+      type: projectType,
+      image: imageData,
+      status: projectJson.status,
+      hidden: projectJson.hidden === true,
+    });
+  }
+
+  return projects
+    .filter(project => !project.hidden)
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
 
 function safeReadJSON(fs: FS, path: string) {
   const bfs = fs as any;
@@ -267,12 +356,11 @@ export function ProjectGalleryDialog({
     setLoading(true);
     setError(null);
 
-    Promise.resolve().then(() => {
-      const scanned = collectProjects(fs);
+    collectProjectsHTTP().then((scanned) => {
       if (!cancelled) {
         setProjects(scanned);
         if (scanned.length === 0) {
-          setError('No projects found in /libraries/Models. Run `npm run build:libs` to build the archive.');
+          setError('No projects found. Check that Models directory is available.');
         }
         setLoading(false);
       }
@@ -343,7 +431,7 @@ export function ProjectGalleryDialog({
     return columns;
   }, [filteredProjects]);
 
-  const openProject = (project: BrowserProject) => {
+  const openProject = async (project: BrowserProject) => {
     try {
       if (!model || mode === 'standalone') {
         const url = new URL(window.location.href);
@@ -354,9 +442,9 @@ export function ProjectGalleryDialog({
       }
 
       if (project.type === 'static') {
-        model.openStaticProject(project.entryPath, { projectId: project.id });
+        await model.openStaticProject(project.entryPath, { projectId: project.id });
       } else {
-        model.openFile(project.entryPath);
+        await model.openFile(project.entryPath);
       }
 
       const url = new URL(window.location.href);

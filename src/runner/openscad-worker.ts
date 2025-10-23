@@ -93,6 +93,21 @@ self.addEventListener('message', async (e: MessageEvent<OpenSCADInvocation>) => 
               console.error(`File ${source.path} does not exist!`);
             }
           } else {
+            // Ensure directory structure exists before writing
+            const pathParts = source.path.split('/');
+            pathParts.pop(); // Remove filename
+            let currentPath = '';
+            for (const part of pathParts) {
+              if (!part) continue; // Skip empty parts
+              currentPath += '/' + part;
+              try {
+                instance.FS.stat(currentPath);
+              } catch (e) {
+                // Directory doesn't exist, create it
+                instance.FS.mkdir(currentPath);
+              }
+            }
+
             instance.FS.writeFile(source.path, await fetchSource(instance.FS, source));
           }
         } catch (e) {
