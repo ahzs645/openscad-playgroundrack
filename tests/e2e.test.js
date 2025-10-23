@@ -94,9 +94,11 @@ function waitForLabel(text) {
 
 describe('e2e', () => {
   test('load the default page', async () => {
-    await page.goto(baseUrl);
+    // Load with a simple cube to ensure the viewer initializes
+    // (the default page now shows a gallery instead of auto-rendering)
+    await loadSrc('cube();');
     await waitForViewer();
-    expectObjectList();
+    expect3DPolySet();
   }, longTimeout);
 
   test('can render cube', async () => {
