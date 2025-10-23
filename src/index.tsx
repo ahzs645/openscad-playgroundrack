@@ -125,7 +125,8 @@ window.addEventListener('load', async () => {
     return enabled;
   })();
 
-  const { fs } = await createEditorFS({prefix: '/libraries/', allowPersistence: isInStandaloneMode()});
+  // Only load critical archives upfront - others will be loaded by OpenSCAD worker when needed
+  const { fs } = await createEditorFS({prefix: '/libraries/', allowPersistence: isInStandaloneMode(), onlyMountCritical: true});
 
   const seedDefaultSource = () => {
     try {

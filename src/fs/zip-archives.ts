@@ -230,7 +230,13 @@ export const deployedArchiveNames =
 
 // Categorize archives for lazy loading
 // Critical archives are loaded immediately, others are loaded on-demand
-export const criticalArchives = ['fonts', 'openscad'];
+// Critical archives are loaded immediately on page load
+// openscad: Required for OpenSCAD library functions
+export const criticalArchives = ['openscad'];
+
+// On-demand archives are only loaded when needed (e.g., when rendering uses them)
+// fonts: Only needed when text() is used in OpenSCAD
+// BOSL2, NopSCADlib, etc.: Only loaded when use<>/include<> references them
 export const onDemandArchives = deployedArchiveNames.filter(
   name => !criticalArchives.includes(name)
 );

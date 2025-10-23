@@ -1,14 +1,16 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import {MultiLayoutComponentId, State, StatePersister} from '../state/app-state'
 import { Model } from '../state/model';
-import EditorPanel from './EditorPanel';
 import ViewerPanel from './ViewerPanel';
 import Footer from './Footer';
 import { ModelContext, FSContext } from './contexts';
 import PanelSwitcher from './PanelSwitcher';
 import { ProjectGalleryDialog } from './ProjectGalleryDialog';
+
+// Lazy load EditorPanel only when editor is enabled
+const EditorPanel = lazy(() => import('./EditorPanel'));
 
 declare global {
   interface Window {
@@ -356,11 +358,13 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
               }}>
 
             {editorEnabledForProject && (
-              <EditorPanel className={`
-                opacity-animated
-                ${layout.mode === 'single' && layout.focus !== 'editor' ? 'opacity-0' : ''}
-                ${layout.mode === 'single' ? 'absolute-fill' : ''}
-              `} style={getPanelStyle('editor')} />
+              <Suspense fallback={<div style={getPanelStyle('editor')} className="flex align-items-center justify-content-center">Loading editor...</div>}>
+                <EditorPanel className={`
+                  opacity-animated
+                  ${layout.mode === 'single' && layout.focus !== 'editor' ? 'opacity-0' : ''}
+                  ${layout.mode === 'single' ? 'absolute-fill' : ''}
+                `} style={getPanelStyle('editor')} />
+              </Suspense>
             )}
             <ViewerPanel className={layout.mode === 'single' ? `absolute-fill` : ''} style={getPanelStyle('viewer')} />
             {!isStaticProject && (

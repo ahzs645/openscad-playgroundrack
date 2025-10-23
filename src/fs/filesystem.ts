@@ -109,8 +109,10 @@ function configureAndInstallFS(windowOrSelf: Window, options: any) {
   });
 }
 
-export async function createEditorFS({prefix, allowPersistence}: {prefix: string, allowPersistence: boolean}): Promise<{ fs: FS, mountedArchives: string[] }> {
-  const archiveNames = deployedArchiveNames;
+export async function createEditorFS({prefix, allowPersistence, onlyMountCritical = false}: {prefix: string, allowPersistence: boolean, onlyMountCritical?: boolean}): Promise<{ fs: FS, mountedArchives: string[] }> {
+  // Only load critical archives upfront to improve initial page load
+  // On-demand archives will be loaded by OpenSCAD worker when needed
+  const archiveNames = onlyMountCritical ? criticalArchives : deployedArchiveNames;
   const { mounts: librariesMounts, mountedArchives } = await getBrowserFSLibrariesMounts(archiveNames);
   const allMounts: FSMounts = {};
   for (const n in librariesMounts) {
