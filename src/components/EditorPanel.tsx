@@ -1,7 +1,7 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { CSSProperties, useContext, useRef, useState } from 'react';
-import Editor, { loader, Monaco } from '@monaco-editor/react';
+import React, { CSSProperties, useContext, useEffect, useRef, useState } from 'react';
+import Editor from '@monaco-editor/react';
 import openscadEditorOptions from '../language/openscad-editor-options.ts';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -12,6 +12,8 @@ import { buildUrlForStateParams } from '../state/fragment-state.ts';
 import { getBlankProjectState, defaultSourcePath } from '../state/initial-state.ts';
 import { ModelContext, FSContext } from './contexts.ts';
 import FilePicker, {  } from './FilePicker.tsx';
+import { registerOpenSCADLanguage } from '../language/openscad-register-language.ts';
+import { zipArchives } from '../fs/zip-archives.ts';
 
 // const isMonacoSupported = false;
 const isMonacoSupported = (() => {
@@ -20,28 +22,82 @@ const isMonacoSupported = (() => {
   return !iosWk;
 })();
 
-let monacoInstance: Monaco | null = null;
-if (isMonacoSupported) {
-  loader.init().then(mi => monacoInstance = mi);
-}
-
 export default function EditorPanel({className, style}: {className?: string, style?: CSSProperties}) {
 
   const model = useContext(ModelContext);
   if (!model) throw new Error('No model');
 
+  const fs = useContext(FSContext);
+  if (!fs) throw new Error('No FS');
+
   const menu = useRef<Menu>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const state = model.state;
 
   const [editor, setEditor] = useState(null as monaco.editor.IStandaloneCodeEditor | null)
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const activePath = state.params.activePath;
+    const lastSlash = activePath.lastIndexOf('/');
+    const baseDir = lastSlash >= 0 ? activePath.substring(0, lastSlash) : '/';
+
+    const newSources: { path: string; content: string }[] = [];
+
+    for (const file of Array.from(files)) {
+      const content = await file.text();
+      const targetPath = `${baseDir}/${file.name}`;
+      newSources.push({ path: targetPath, content });
+    }
+
+    model.mutate(s => {
+      const existing = s.params.sources ?? [];
+      const updated = [...existing];
+
+      for (const source of newSources) {
+        const index = updated.findIndex(src => src.path === source.path);
+        if (index >= 0) {
+          updated[index] = { ...updated[index], content: source.content };
+        } else {
+          updated.push({ path: source.path, content: source.content });
+        }
+      }
+
+      s.params.sources = updated;
+    });
+
+    // Trigger a new preview render so imports that reference the uploaded
+    // files (e.g. import("stamp.svg")) can be resolved.
+    model.render({ isPreview: true, now: true });
+
+    // Allow re-selecting the same file later.
+    event.target.value = '';
+  };
+
+  useEffect(() => {
+    if (!isMonacoSupported) {
+      return;
+    }
+    (async () => {
+      try {
+        await registerOpenSCADLanguage(fs, '/', zipArchives);
+      } catch (e) {
+        console.error('Failed to register OpenSCAD language.', e);
+      }
+    })();
+  }, [fs]);
+
   if (editor) {
     const checkerRun = state.lastCheckerRun;
     const editorModel = editor.getModel();
     if (editorModel) {
-      if (checkerRun && monacoInstance) {
-        monacoInstance.editor.setModelMarkers(editorModel, 'openscad', checkerRun.markers);
+      if (checkerRun) {
+        monaco.editor.setModelMarkers(editorModel, 'openscad', checkerRun.markers);
       }
     }
   }
@@ -84,7 +140,16 @@ export default function EditorPanel({className, style}: {className?: string, sty
       <div className='flex flex-row gap-2' style={{
         margin: '5px',
       }}>
-          
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".svg,image/svg+xml"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+
         <Menu model={[
           {
             label: "New project",
@@ -116,7 +181,9 @@ export default function EditorPanel({className, style}: {className?: string, sty
           {
             label: "Upload file(s)",
             icon: 'pi pi-upload',
-            disabled: true,
+            command: () => {
+              fileInputRef.current?.click();
+            },
           },
           {
             label: 'Download sources',

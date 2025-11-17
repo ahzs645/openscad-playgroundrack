@@ -5,7 +5,6 @@ import OpenSCAD from "../wasm/openscad.js";
 
 import { createEditorFS, symlinkLibraries } from "../fs/filesystem.ts";
 import { OpenSCADInvocation, OpenSCADInvocationCallback, OpenSCADInvocationResults } from "./openscad-runner.ts";
-import { deployedArchiveNames } from "../fs/zip-archives.ts";
 import { fetchSource } from "../utils.ts";
 
 importScripts("browserfs.min.js");
@@ -13,6 +12,18 @@ importScripts("browserfs.min.js");
 declare const self: DedicatedWorkerGlobalScope;
 
 export type MergedOutputs = {stdout?: string, stderr?: string, error?: string}[];
+
+let mountedArchivesPromise: Promise<string[]> | null = null;
+
+async function ensureBrowserFSLibrariesMounted(): Promise<string[]> {
+  if (!mountedArchivesPromise) {
+    mountedArchivesPromise = (async () => {
+      const { mountedArchives } = await createEditorFS({prefix: '', allowPersistence: false});
+      return mountedArchives;
+    })();
+  }
+  return mountedArchivesPromise;
+}
 
 function callback(payload: OpenSCADInvocationCallback) {
   self.postMessage(payload);
@@ -46,7 +57,7 @@ self.addEventListener('message', async (e: MessageEvent<OpenSCADInvocation>) => 
 
     if (mountArchives) {
       // This will mount lots of libraries' ZIP archives under /libraries/<name> -> <name>.zip
-      const { mountedArchives } = await createEditorFS({prefix: '', allowPersistence: false});
+      const mountedArchives = await ensureBrowserFSLibrariesMounted();
       
       instance.FS.mkdir('/libraries');
       

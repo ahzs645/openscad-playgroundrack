@@ -5,8 +5,6 @@ import ReactDOM from 'react-dom/client';
 import PrimeReact from 'primereact/api';
 import {App} from './components/App.tsx';
 import { createEditorFS } from './fs/filesystem.ts';
-import { registerOpenSCADLanguage } from './language/openscad-register-language.ts';
-import { zipArchives } from './fs/zip-archives.ts';
 import {readStateFromFragment} from './state/fragment-state.ts'
 import { createInitialState, defaultSourcePath } from './state/initial-state.ts';
 import defaultScad from './state/default-scad.ts';
@@ -53,36 +51,7 @@ if (nodeEnv !== 'production') {
 
 declare var BrowserFS: BrowserFSInterface
 
-
-window.addEventListener('load', async () => {
-  //*
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-  if (nodeEnv === 'production' && !isLocalhost) {
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register('./sw.js');
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-
-            registration.onupdatefound = () => {
-                const installingWorker = registration.installing;
-                if (installingWorker) {
-                  installingWorker.onstatechange = () => {
-                      if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                          // Reload to activate the service worker and apply caching
-                          window.location.reload();
-                          return;
-                      }
-                  };
-                }
-            };
-        } catch (err) {
-            console.log('ServiceWorker registration failed: ', err);
-        }
-    }
-  }
-  //*/
-  
+async function bootstrap() {
   registerCustomAppHeightCSSProperty();
 
   const computeDefaultEditorEnabled = () => {
@@ -142,8 +111,6 @@ window.addEventListener('load', async () => {
 
   seedDefaultSource();
 
-  await registerOpenSCADLanguage(fs, '/', zipArchives);
-
   let statePersister: StatePersister;
   let persistedState: State | null = null;
 
@@ -182,4 +149,48 @@ window.addEventListener('load', async () => {
       <App initialState={initialState} statePersister={statePersister} fs={fs} />
     </React.StrictMode>
   );
+}
+
+// Start bootstrapping as soon as the DOM is ready, without waiting for all resources
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    bootstrap().catch(err => {
+      console.error('Failed to bootstrap OpenSCAD Playground.', err);
+    });
+  });
+} else {
+  bootstrap().catch(err => {
+    console.error('Failed to bootstrap OpenSCAD Playground.', err);
+  });
+}
+
+// Keep service worker registration on window load so it does not block initial interactivity
+window.addEventListener('load', async () => {
+  //*
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  if (nodeEnv === 'production' && !isLocalhost) {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('./sw.js');
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+
+            registration.onupdatefound = () => {
+                const installingWorker = registration.installing;
+                if (installingWorker) {
+                  installingWorker.onstatechange = () => {
+                      if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                          // Reload to activate the service worker and apply caching
+                          window.location.reload();
+                          return;
+                      }
+                  };
+                }
+            };
+        } catch (err) {
+            console.log('ServiceWorker registration failed: ', err);
+        }
+    }
+  }
+  //*/
 });

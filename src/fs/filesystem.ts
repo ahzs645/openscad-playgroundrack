@@ -40,13 +40,13 @@ export async function getBrowserFSLibrariesMounts(archiveNames: string[]): Promi
   const mounts: FSMounts = {};
   const mountedArchives: string[] = [];
 
-  for (const name of archiveNames) {
+  await Promise.all(archiveNames.map(async (name) => {
     const url = `./libraries/${name}.zip`;
     try {
       const response = await fetch(url);
       if (!response.ok) {
         console.warn(`[filesystem] Skipping ${name}.zip (HTTP ${response.status})`);
-        continue;
+        return;
       }
       const data = Buffer.from(await response.arrayBuffer());
       await validateZipArchive(data);
@@ -60,7 +60,7 @@ export async function getBrowserFSLibrariesMounts(archiveNames: string[]): Promi
     } catch (error) {
       console.error(`[filesystem] Failed to load archive ${name}.zip`, error);
     }
-  }
+  }));
 
   if (mountedArchives.length === 0) {
     console.warn('[filesystem] No library archives were mounted. Run `npm run build:libs` to generate ZIP archives.');
