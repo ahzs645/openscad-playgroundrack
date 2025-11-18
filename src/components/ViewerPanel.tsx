@@ -202,6 +202,11 @@ export default function ViewerPanel({className, style}: {className?: string, sty
         }} />
       }
 
+      {/*
+        Note: AR viewers (e.g. ARKit / Quick Look) interpret 1 unit as 1 meter.
+        Our models are effectively authored in millimeters, so we apply a
+        global 0.001 scale so that 100 mm becomes 0.1 m (10 cm) in AR.
+      */}
       <model-viewer
         orientation="0deg -90deg 0deg"
         class="main-viewer"
@@ -213,6 +218,7 @@ export default function ViewerPanel({className, style}: {className?: string, sty
           width: '100%',
           height: '100%',
         }}
+        scale="0.001 0.001 0.001"
         camera-orbit={originalOrbit}
         interaction-prompt={interactionPrompt}
         environment-image="./skybox-lights.jpg"
