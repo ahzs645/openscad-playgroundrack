@@ -123,6 +123,7 @@ const config = [
         'process.env.PLAYGROUND_EDITOR_TOGGLE': JSON.stringify(process.env.PLAYGROUND_EDITOR_TOGGLE || ''),
         'process.env.PLAYGROUND_CUSTOMIZER_OPEN': JSON.stringify(process.env.PLAYGROUND_CUSTOMIZER_OPEN || ''),
         'process.env.PLAYGROUND_KANBAN_ENABLED': JSON.stringify(process.env.PLAYGROUND_KANBAN_ENABLED || ''),
+        'process.env.PLAYGROUND_URL_STATE_ENABLED': JSON.stringify(process.env.PLAYGROUND_URL_STATE_ENABLED || ''),
       }),
       ...(process.env.NODE_ENV === 'production' ? [
         new WorkboxPlugin.GenerateSW({

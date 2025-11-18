@@ -94,6 +94,9 @@ async function bootstrap() {
     return enabled;
   })();
 
+  // Disable URL state persistence for now to keep links clean.
+  const urlStateEnabled = false;
+
   // Only load critical archives upfront - others will be loaded by OpenSCAD worker when needed
   const { fs } = await createEditorFS({prefix: '/libraries/', allowPersistence: isInStandaloneMode(), onlyMountCritical: true});
 
@@ -133,10 +136,20 @@ async function bootstrap() {
       }
     };
   } else {
-    persistedState = await readStateFromFragment();
-    statePersister = {
-      set: writeStateInFragment,
-    };
+    if (urlStateEnabled) {
+      persistedState = await readStateFromFragment();
+      statePersister = {
+        set: writeStateInFragment,
+      };
+    } else {
+      persistedState = null;
+      statePersister = {
+        set: async () => {},
+      };
+      if (typeof window !== 'undefined' && typeof history !== 'undefined') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
   }
 
   const initialState = createInitialState(editorEnabled ? persistedState : null);
