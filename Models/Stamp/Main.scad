@@ -10,7 +10,7 @@ component_selection = "stamp"; // [stamp:Stamp, handle:Handle]
 svg_style = "negative"; // [positive, negative]
 
 // Parameters
-svg_file = "Artboard 1 2.svg";
+svg_file = "yaa.svg";
 svg_stroke_width = 0.7;
 knub_height = 10;
 knub_radius = 10;
