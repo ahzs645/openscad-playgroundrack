@@ -327,12 +327,93 @@ export class Model {
         s.params.sources = s.params.sources.map(src => src.path === s.params.activePath ? {...src, content} : src);
       });
     }
+
+    this.ensureModelResourcesForScad();
+
     if (this.source.trim() !== '') {
       if (this.state.params.activePath.endsWith('.scad')) {
         this.checkSyntax();
       }
       this.render({isPreview: true, now: false});
     }
+  }
+
+  /**
+   * Ensure auxiliary resources (like STL files) used by Models projects
+   * are available to the OpenSCAD worker by adding them as inputs.
+   *
+   * This is particularly important for projects under /libraries/Models
+   * that refer to local STL files (e.g., the Stamp project uses
+   * stamp_template_knub.stl via the stamp_knub variable and
+   * stamp_template_handle.stl via a direct import()).
+   */
+  private ensureModelResourcesForScad() {
+    const { activePath, sources } = this.state.params;
+    if (!activePath.endsWith('.scad')) {
+      return;
+    }
+    if (!activePath.startsWith('/libraries/Models/')) {
+      return;
+    }
+
+    const scadSource = sources.find(src => src.path === activePath);
+    const content = scadSource?.content;
+    if (!content) {
+      return;
+    }
+
+    const baseDir = activePath.substring(0, activePath.lastIndexOf('/'));
+
+    // Look for variables assigned to STL filenames, e.g.
+    // stamp_knub = "stamp_template_knub.stl";
+    const stlAssignmentRegex = /\b[A-Za-z_][A-Za-z0-9_]*\s*=\s*"([^"\r\n]+\.stl)"/g;
+
+    // Also look for direct STL imports, e.g.
+    // import("stamp_template_handle.stl", center=true);
+    const stlImportRegex = /import\(\s*"([^"\r\n]+\.stl)"/g;
+
+    const extraSources: { path: string; url: string }[] = [];
+    const addStlResource = (fileName: string) => {
+      const resourcePath = fileName.startsWith('/')
+        ? fileName
+        : `${baseDir}/${fileName}`;
+
+      if (!resourcePath.startsWith('/libraries/Models/')) {
+        return;
+      }
+
+      const existsInSources = sources.some(s => s.path === resourcePath);
+      const existsInExtras = extraSources.some(s => s.path === resourcePath);
+      if (existsInSources || existsInExtras) {
+        return;
+      }
+
+      const url = resourcePath.replace('/libraries/Models/', '/Models/');
+      extraSources.push({ path: resourcePath, url });
+    };
+
+    let match: RegExpExecArray | null;
+    while ((match = stlAssignmentRegex.exec(content)) !== null) {
+      addStlResource(match[1]);
+    }
+    while ((match = stlImportRegex.exec(content)) !== null) {
+      addStlResource(match[1]);
+    }
+
+    if (extraSources.length === 0) {
+      return;
+    }
+
+    this.mutate(s => {
+      const existingPaths = new Set(s.params.sources.map(src => src.path));
+      const nextSources = [...s.params.sources];
+      for (const src of extraSources) {
+        if (!existingPaths.has(src.path)) {
+          nextSources.push({ path: src.path, url: src.url });
+        }
+      }
+      s.params.sources = nextSources;
+    });
   }
 
   async checkSyntax() {

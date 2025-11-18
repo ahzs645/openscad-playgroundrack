@@ -2,6 +2,10 @@
 $fn = 50;
 stamp_knub = "stamp_template_knub.stl";
 
+/*[Component Selection]*/
+// Combo box to select which component to render
+component_selection = "stamp"; // [stamp:Stamp, handle:Handle]
+
 // Stamp style selection
 svg_style = "negative"; // [positive, negative]
 
@@ -22,43 +26,50 @@ reverse_svg = true;
 x = wrapper_rect[0]/2 - rounded_radius;
 y = wrapper_rect[1]/2 - rounded_radius;
 
-// Main union of components
-union() {
-    // Stamp SVG based on style
-    if (svg_style == "positive") {
-        color("white", 0.8) 
-            translate([0, 0, knub_height]) 
-                linear_extrude(stamp_ridge_height + 0.1) 
-                    processed_svg();
-    } else {
-        difference() {
-            // Create a rounded flat surface at knub height
-            translate([0, 0, 10])
-                linear_extrude(cut_depth)
-                    rounded_rectangle();
-            
-            // Cut out the SVG pattern
-            translate([0, 0, 10 - 0.1])
-                linear_extrude(cut_depth + 0.2)
-                    processed_svg();
-        }
-    }
-    
-    // Add the knub
-    rotate(30) {
-        color("red", 0.5) {
-            import(stamp_knub, center=true);
-        }
-    }
-    
-    // Add the wrapper
-    color("blue", 0.5) {
-        linear_extrude(knub_height) {
+// Main components
+if (component_selection == "stamp") {
+    union() {
+        // Stamp SVG based on style
+        if (svg_style == "positive") {
+            color("white", 0.8) 
+                translate([0, 0, knub_height]) 
+                    linear_extrude(stamp_ridge_height + 0.1) 
+                        processed_svg();
+        } else {
             difference() {
-                rounded_rectangle();
-                circle(knub_radius - 0.1);
+                // Create a rounded flat surface at knub height
+                translate([0, 0, 10])
+                    linear_extrude(cut_depth)
+                        rounded_rectangle();
+                
+                // Cut out the SVG pattern
+                translate([0, 0, 10 - 0.1])
+                    linear_extrude(cut_depth + 0.2)
+                        processed_svg();
             }
         }
+        
+        // Add the knub
+        rotate(30) {
+            color("red", 0.5) {
+                import(stamp_knub, center=true);
+            }
+        }
+        
+        // Add the wrapper
+        color("blue", 0.5) {
+            linear_extrude(knub_height) {
+                difference() {
+                    rounded_rectangle();
+                    circle(knub_radius - 0.1);
+                }
+            }
+        }
+    }
+} else if (component_selection == "handle") {
+    // Show only the handle template STL
+    color("red", 0.5) {
+        import("stamp_template_handle.stl", center=true);
     }
 }
 

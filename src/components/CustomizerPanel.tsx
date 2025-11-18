@@ -1,6 +1,6 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
-import React, { CSSProperties, useContext, useState, useEffect } from 'react';
+import React, { CSSProperties, useContext, useState, useEffect, useRef } from 'react';
 import { ModelContext, FSContext } from './contexts.ts';
 
 import { Dropdown } from 'primereact/dropdown';
@@ -11,6 +11,7 @@ import { InputText } from 'primereact/inputtext';
 import { Fieldset } from 'primereact/fieldset';
 import { Parameter } from '../state/customizer-types.ts';
 import { Button } from 'primereact/button';
+import { readFileAsDataURL } from '../utils.ts';
 
 type PresetData = {
   fileFormatVersion: string;
@@ -187,6 +188,63 @@ export default function CustomizerPanel({className, style}: {className?: string,
 };
 
 function ParameterInput({param, value, className, style, handleChange}: {param: Parameter, value: any, className?: string, style?: CSSProperties, handleChange: (key: string, value: any) => void}) {
+  const model = useContext(ModelContext);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isSvgFileParam = param.type === 'string' && param.name === 'svg_file';
+  const isStampKnubParam = param.type === 'string' && param.name === 'stamp_knub';
+  const isFileUploadParam = isSvgFileParam || isStampKnubParam;
+
+  const handleFileUploadChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!model) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const file = files[0];
+    const activePath = model.state.params.activePath;
+    const lastSlash = activePath.lastIndexOf('/');
+    const baseDir = lastSlash >= 0 ? activePath.substring(0, lastSlash) : '/';
+    const targetPath = `${baseDir}/${file.name}`;
+
+    if (isSvgFileParam) {
+      const content = await file.text();
+
+      model.mutate(s => {
+        const existing = s.params.sources ?? [];
+        const updated = [...existing];
+        const index = updated.findIndex(src => src.path === targetPath);
+        if (index >= 0) {
+          updated[index] = {...updated[index], content};
+        } else {
+          updated.push({path: targetPath, content});
+        }
+        s.params.sources = updated;
+      });
+    } else if (isStampKnubParam) {
+      const dataUrl = await readFileAsDataURL(file);
+
+      model.mutate(s => {
+        const existing = s.params.sources ?? [];
+        const updated = [...existing];
+        const index = updated.findIndex(src => src.path === targetPath);
+        if (index >= 0) {
+          updated[index] = {...updated[index], url: dataUrl};
+        } else {
+          updated.push({path: targetPath, url: dataUrl});
+        }
+        s.params.sources = updated;
+      });
+    }
+
+    handleChange(param.name, file.name);
+    model.render({isPreview: true, now: true});
+
+    // Allow re-selecting the same file later.
+    event.target.value = '';
+  };
+
   return (
     <div 
       style={{
@@ -254,11 +312,37 @@ function ParameterInput({param, value, className, style, handleChange}: {param: 
             />
           )}
           {param.type === 'string' && !param.options && (
-            <InputText
-              style={{flex: 1}}
-              value={value || param.initial}
-              onChange={(e) => handleChange(param.name, e.target.value)}
-            />
+            <>
+              <InputText
+                style={{flex: 1}}
+                value={value || param.initial}
+                onChange={(e) => handleChange(param.name, e.target.value)}
+              />
+              {isFileUploadParam && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={
+                      isSvgFileParam
+                        ? ".svg,image/svg+xml"
+                        : isStampKnubParam
+                          ? ".stl,model/stl"
+                          : undefined
+                    }
+                    style={{ display: 'none' }}
+                    onChange={handleFileUploadChange}
+                  />
+                  <Button
+                    icon="pi pi-upload"
+                    className="p-button-text"
+                    style={{ marginLeft: '0.5rem' }}
+                    onClick={() => fileInputRef.current?.click()}
+                    title={isSvgFileParam ? "Upload SVG file" : "Upload STL file"}
+                  />
+                </>
+              )}
+            </>
           )}
           {Array.isArray(param.initial) && 'min' in param && (
             <div style={{
