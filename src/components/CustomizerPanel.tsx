@@ -38,8 +38,8 @@ export default function CustomizerPanel({className, style}: {className?: string,
     const activePath = state.params.activePath;
     console.log('Checking for main.json, activePath:', activePath);
 
-    if (!activePath || !activePath.endsWith('.scad') || !fs) {
-      console.log('Skipping main.json check:', { activePath, hasFs: !!fs });
+    if (!activePath || !activePath.endsWith('.scad')) {
+      console.log('Skipping main.json check:', { activePath });
       setPresetData(null);
       return;
     }
@@ -49,6 +49,44 @@ export default function CustomizerPanel({className, style}: {className?: string,
     const mainJsonPathAlt = `${directory}/Main.json`; // Try alternate capitalization
 
     console.log('Looking for main.json at:', mainJsonPath);
+
+    // For Models loaded from HTTP, fetch Main.json via HTTP
+    if (activePath.startsWith('/libraries/Models/')) {
+      const httpDirectory = directory.replace('/libraries/Models/', '/Models/');
+      const httpMainJsonPath = `${httpDirectory}/Main.json`;
+      const httpMainJsonPathAlt = `${httpDirectory}/main.json`;
+
+      console.log('Fetching main.json via HTTP:', httpMainJsonPath);
+
+      (async () => {
+        try {
+          let response = await fetch(httpMainJsonPath);
+          if (!response.ok) {
+            response = await fetch(httpMainJsonPathAlt);
+          }
+          if (response.ok) {
+            const content = await response.text();
+            const parsed = JSON.parse(content) as PresetData;
+            console.log('Loaded preset data from HTTP:', parsed);
+            setPresetData(parsed);
+          } else {
+            console.log('main.json not found via HTTP');
+            setPresetData(null);
+          }
+        } catch (error) {
+          console.warn('Error fetching main.json:', error);
+          setPresetData(null);
+        }
+      })();
+      return;
+    }
+
+    // For local files, try reading from filesystem
+    if (!fs) {
+      console.log('No filesystem available');
+      setPresetData(null);
+      return;
+    }
 
     try {
       const bfs = fs as any;
