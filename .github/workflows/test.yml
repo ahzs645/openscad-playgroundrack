@@ -24,14 +24,15 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node.version }}
+          cache: 'npm'
       - name: Cache Puppeteer Chrome
         uses: actions/cache@v4
         with:
           path: ~/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('package.json') }}
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             puppeteer-${{ runner.os }}-
-      - run: npm install
+      - run: npm ci
       - name: Install Puppeteer's Chrome
         run: npx puppeteer browsers install chrome
       - run: npm run build:all
