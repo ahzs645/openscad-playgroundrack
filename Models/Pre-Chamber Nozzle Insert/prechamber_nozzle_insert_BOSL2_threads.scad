@@ -43,6 +43,11 @@ $fs = 0.25;
 // User-adjustable dimensions
 // -------------------------
 
+// Dimension preset selector.
+//   "original"  = first-pass guess: 3/4" hex, 21.5 mm collar OD.
+//   "corrected" = user-supplied correction: 5/8" hex, 0.73" (18.542 mm) collar OD.
+dim_preset = "corrected"; // [original, corrected]
+
 // Toggle true BOSL2 threads vs. plain cylinders.  Leave true for thread model.
 model_external_thread = true;
 model_internal_thread = true;
@@ -69,8 +74,11 @@ internal_thread_slop = 0.00;     // BOSL2 internal thread clearance; set >0 for 
 plain_int_bore_d   = 8.8;        // approximate M10x1 tap drill/minor bore reference
 
 // Hex / shoulder / tip shape
-hex_af             = 19.05;      // 3/4 inch across flats
-flange_d           = 21.5;       // guessed round flange OD
+// Preset-driven: 3/4" (19.05 mm) vs corrected 5/8" (15.875 mm) across flats.
+hex_af             = (dim_preset == "corrected") ? 15.875 : 19.05;
+// Round collar/flange immediately below the hex.
+// Original guess 21.5 mm; corrected 0.73" = 18.542 mm.
+flange_d           = (dim_preset == "corrected") ? 18.542 : 21.5;
 nose_tip_flat_d    = 5.8;        // diameter of flat at conical tip around axial hole; guessed
 
 // Internal pre-chamber/bore behind the small axial tip hole.
