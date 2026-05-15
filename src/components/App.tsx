@@ -7,6 +7,7 @@ import Footer from './Footer';
 import { ModelContext, FSContext } from './contexts';
 import PanelSwitcher from './PanelSwitcher';
 import { ProjectGalleryDialog } from './ProjectGalleryDialog';
+import { readShareFromQuery, stripShareFromUrl } from '../state/share-link';
 
 // Heavy panels are split out so the landing/gallery view ships without them.
 const EditorPanel = lazy(() => import('./EditorPanel'));
@@ -237,6 +238,13 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
         } else {
           setGalleryVisible(false);
           setGalleryVariant(defaultGalleryVariant);
+          const share = await readShareFromQuery();
+          if (share?.vars) {
+            for (const [name, value] of Object.entries(share.vars)) {
+              model.setVar(name, value);
+            }
+            stripShareFromUrl();
+          }
         }
       })();
     }

@@ -15,16 +15,17 @@
 
   Notes:
   - This is reverse-engineering starter CAD only, not a production drawing.
-  - Dimensions other than the provided threads/holes/hex are estimated from photos.
+  - Dimensions other than the provided threads/holes/hex/collar are estimated from photos.
   - For a live engine / combustion / pressure part, final geometry, material,
     heat treatment, tolerances, and inspection should be specified by a qualified
     engineer or machinist.
   - Metal AM threads this small usually still need post-machining/tapping/chasing.
 
-  Known from supplied notes/photos:
+  Known from supplied notes/photos and later email correction:
   - External thread: M14 x 1.25
   - Internal thread: M10 x 1.0, approx. 19 mm deep
-  - Hex: 3/4 inch across flats = 19.05 mm
+  - Hex: 5/8 inch across flats = 15.875 mm
+  - Round collar immediately below hex: 0.73 inch OD = 18.542 mm
   - Holes at nozzle end: one axial 2.5 mm, one radial 2.5 mm, two radial 1.0 mm
 
   Coordinate system:
@@ -43,21 +44,24 @@ $fs = 0.25;
 // User-adjustable dimensions
 // -------------------------
 
-// Dimension preset selector.
-//   "original"  = first-pass guess: 3/4" hex, 21.5 mm collar OD.
-//   "corrected" = user-supplied correction: 5/8" hex, 0.73" (18.542 mm) collar OD.
-dim_preset = "corrected"; // [original, corrected]
+/* [Dimensions] */
+// User correction from email:
+//   hex across flats = 5/8 in = 15.875 mm
+//   collar OD immediately below hex = 0.73 in = 18.542 mm
+hex_af             = 15.875;
+collar_d           = 18.542;
 
-// Toggle true BOSL2 threads vs. plain cylinders.  Leave true for thread model.
+/* [Hidden] */
+// Toggle true BOSL2 threads vs. plain cylinders. Leave true for thread model.
 model_external_thread = true;
 model_internal_thread = true;
 
-// Main envelope; guessed from photos/tape. Adjust with calipers/CMM.
-overall_len        = 35.0;       // total length, mm; guessed from tape photos
-nose_len           = 7.0;        // conical nose length, mm; guessed
-threaded_len       = 21.5;       // external M14 threaded section length, mm; guessed
-flange_h           = 2.8;        // round shoulder/flange height, mm; guessed
-hex_h              = overall_len - nose_len - threaded_len - flange_h;
+// Main envelope; still estimated from photos/tape unless measured with calipers/CMM.
+overall_len        = 35.0;       // total length, mm; estimated
+nose_len           = 7.0;        // conical nose length, mm; estimated
+threaded_len       = 21.5;       // external M14 threaded section length, mm; estimated
+collar_h           = 2.8;        // round shoulder/collar height, mm; estimated
+hex_h              = overall_len - nose_len - threaded_len - collar_h;
 
 // External M14x1.25 thread section
 ext_thread_major_d = 14.0;       // M14 nominal major OD
@@ -73,17 +77,10 @@ internal_thread_slop = 0.00;     // BOSL2 internal thread clearance; set >0 for 
 // Bore used if true helical internal thread is disabled; also used for small reliefs.
 plain_int_bore_d   = 8.8;        // approximate M10x1 tap drill/minor bore reference
 
-// Hex / shoulder / tip shape
-// Preset-driven: 3/4" (19.05 mm) vs corrected 5/8" (15.875 mm) across flats.
-hex_af             = (dim_preset == "corrected") ? 15.875 : 19.05;
-// Round collar/flange immediately below the hex.
-// Original guess 21.5 mm; corrected 0.73" = 18.542 mm.
-flange_d           = (dim_preset == "corrected") ? 18.542 : 21.5;
-nose_tip_flat_d    = 5.8;        // diameter of flat at conical tip around axial hole; guessed
-
-// Internal pre-chamber/bore behind the small axial tip hole.
-prechamber_d       = 5.5;        // guessed internal chamber diameter
-prechamber_start_z = 2.2;        // axial tip hole opens into chamber here; guessed
+// Tip / pre-chamber shape
+nose_tip_flat_d    = 5.8;        // diameter of flat at conical tip around axial hole; estimated
+prechamber_d       = 5.5;        // estimated internal chamber diameter
+prechamber_start_z = 2.2;        // axial tip hole opens into chamber here; estimated
 int_thread_start_z = overall_len - int_thread_depth;
 prechamber_end_z   = int_thread_start_z + 0.6;  // slight overlap into rear thread cut
 
@@ -91,7 +88,7 @@ prechamber_end_z   = int_thread_start_z + 0.6;  // slight overlap into rear thre
 axial_hole_d       = 2.5;
 side_large_d       = 2.5;
 side_small_d       = 1.0;
-side_hole_z        = 4.2;        // radial hole Z location on conical end; guessed
+side_hole_z        = 4.2;        // radial hole Z location on conical end; estimated
 side_hole_cut_len  = 12.0;
 
 // Hole clocking around the cone. Adjust these after inspecting the sample.
@@ -101,6 +98,9 @@ small_side_angle_2 = 240;
 
 // Small clearance so subtractive cuts pass cleanly through faces.
 eps = 0.03;
+
+// Derived values for reference/debugging.
+hex_vertex_d       = 2 * hex_af / sqrt(3);  // OpenSCAD 6-sided cylinder diameter
 
 // -------------------------
 // Helpers
@@ -135,7 +135,7 @@ module internal_M10_thread_cut(depth) {
     start_z = overall_len - depth;
 
     if (model_internal_thread) {
-        // BOSL2 internal thread mask.  This is subtracted from the body.
+        // BOSL2 internal thread mask. This is subtracted from the body.
         // It extends a bit past the open end and overlaps the pre-chamber cut.
         translate([0, 0, start_z - eps])
             threaded_rod(
@@ -155,7 +155,7 @@ module internal_M10_thread_cut(depth) {
 }
 
 module radial_hole_from_center(d, z, angle_deg, cut_len) {
-    // Radial hole from the center/chamber outward.  It cuts one side only.
+    // Radial hole from the center/chamber outward. It cuts one side only.
     rotate([0, 0, angle_deg])
         translate([0, 0, z])
             rotate([0, 90, 0])
@@ -182,12 +182,12 @@ module positive_body() {
         translate([0, 0, nose_len])
             external_M14_thread(threaded_len);
 
-        // Round shoulder/flange below the hex.
+        // Round collar immediately below the hex, corrected to 0.73 in OD.
         translate([0, 0, nose_len + threaded_len])
-            cylinder(h=flange_h, d=flange_d);
+            cylinder(h=collar_h, d=collar_d);
 
-        // 3/4 inch hex end.
-        translate([0, 0, nose_len + threaded_len + flange_h])
+        // 5/8 inch across-flats hex end.
+        translate([0, 0, nose_len + threaded_len + collar_h])
             hex_prism_af(hex_af, hex_h);
     }
 }

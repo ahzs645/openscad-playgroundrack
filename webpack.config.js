@@ -117,6 +117,9 @@ const config = [
       },
     },
     plugins: [
+      // json-url's stream codec dynamically imports node:zlib behind a process.versions?.node guard
+      // that never matches in the browser. Mark the scheme as external so webpack doesn't try to bundle it.
+      new webpack.IgnorePlugin({ resourceRegExp: /^node:zlib$/ }),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
         'process.env.PLAYGROUND_EDITOR_ENABLED': JSON.stringify(process.env.PLAYGROUND_EDITOR_ENABLED || ''),

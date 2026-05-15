@@ -9,6 +9,7 @@ import { Badge } from 'primereact/badge';
 import { Toast } from 'primereact/toast';
 import HelpMenu from './HelpMenu.tsx';
 import ExportButton from './ExportButton.tsx';
+import ShareButton from './ShareButton.tsx';
 import SettingsMenu from './SettingsMenu.tsx';
 import MultimaterialColorsDialog from './MultimaterialColorsDialog.tsx';
 
@@ -74,6 +75,7 @@ export default function Footer({style}: {style?: CSSProperties}) {
               />
         ) : undefined
       }
+      {!isStaticProject && <ShareButton />}
       <MultimaterialColorsDialog />
       {/* <Button
         icon="pi pi-bolt"

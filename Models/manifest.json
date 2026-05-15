@@ -156,8 +156,8 @@
         "static"
       ],
       "author": "Reverse-engineered starter CAD",
-      "entry": "playground.glb",
-      "type": "static",
+      "entry": "prechamber_nozzle_insert_BOSL2_threads.scad",
+      "type": "scad",
       "hidden": false
     },
     {
