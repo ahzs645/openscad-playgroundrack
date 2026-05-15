@@ -10,9 +10,7 @@ import JSZip from 'jszip';
 import { ProcessStreams } from "../runner/openscad-runner.ts";
 import { is2DFormatExtension } from "./formats.ts";
 import { parseOff } from "../io/import_off.ts";
-import { exportGlb } from "../io/export_glb.ts";
-import { export3MF } from "../io/export_3mf.ts";
-import chroma from "chroma-js";
+// gltf-transform + chroma-js are loaded on first use to keep the initial bundle small.
 
 const githubRx = /^https:\/\/github.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/;
 
@@ -492,6 +490,10 @@ export class Model {
       if (exportFormat === '3mf') {
         const start = performance.now();
         const data = parseOff(await this.state.output.outFile.text());
+        const [{ export3MF }, { default: chroma }] = await Promise.all([
+          import("../io/export_3mf.ts"),
+          import("chroma-js"),
+        ]);
         const exportedData = export3MF(data, this.state.params.extruderColors?.map(c => chroma(c)));
         const elapsedMillis = performance.now() - start;
         output = {
@@ -659,6 +661,7 @@ export class Model {
       }
       if (displayFile.name.endsWith('.off')) {
         const offData = parseOff(await displayFile.text());
+        const { exportGlb } = await import("../io/export_glb.ts");
         displayFile = new File([await exportGlb(offData)], displayFile.name.replace('.off', '.glb'));
       }
       const outFileURL = URL.createObjectURL(output.outFile);

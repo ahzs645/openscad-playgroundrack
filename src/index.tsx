@@ -8,7 +8,12 @@ import { createEditorFS } from './fs/filesystem.ts';
 import {readStateFromFragment} from './state/fragment-state.ts'
 import { createInitialState, defaultSourcePath } from './state/initial-state.ts';
 import defaultScad from './state/default-scad.ts';
+import { preloadProjects } from './state/projects-loader.ts';
 import './index.css';
+
+// Warm the gallery cache in parallel with the FS mount so the landing
+// page paints with project tiles immediately.
+preloadProjects();
 
 import debug from 'debug';
 import { isInStandaloneMode, registerCustomAppHeightCSSProperty } from './utils.ts';

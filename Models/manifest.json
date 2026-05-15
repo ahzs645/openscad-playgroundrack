@@ -1,0 +1,212 @@
+{
+  "generatedAt": "2026-05-15T17:58:20.762Z",
+  "projects": [
+    {
+      "id": "3D Rack SCAD",
+      "title": "3D Rack System",
+      "description": "Customizable modular rack system for organizing components and tools",
+      "category": "Organization",
+      "tags": [
+        "rack",
+        "organization",
+        "modular",
+        "storage"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Atmospheric Sampler",
+      "title": "Atmospheric Sampler",
+      "description": "3D model of an atmospheric sampler device with interactive viewing and AR support",
+      "category": "Examples",
+      "tags": [
+        "static",
+        "glb",
+        "model",
+        "3d"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "Atmospheric Sampler Project v81.glb",
+      "type": "static",
+      "hidden": false
+    },
+    {
+      "id": "Saboteur card holder",
+      "title": "Card Holder Grid",
+      "description": "Organizational grid system for holding and displaying cards, perfect for board games",
+      "category": "Games & Hobbies",
+      "tags": [
+        "cards",
+        "holder",
+        "grid",
+        "games",
+        "organization"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Tray Scad",
+      "title": "Custom Tray System",
+      "description": "Customizable tray system for organizing tools and small items",
+      "category": "Organization",
+      "tags": [
+        "tray",
+        "organization",
+        "tools",
+        "storage"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Keyguard with Raised Tabs",
+      "title": "Customizable Keyguard",
+      "description": "3D printable keyguard for tablets and AAC devices with customizable raised tabs",
+      "category": "Accessibility",
+      "tags": [
+        "keyguard",
+        "accessibility",
+        "tablet",
+        "AAC",
+        "customizable"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Periodic Table",
+      "title": "Interlocking Boxes System",
+      "description": "Modular interlocking box system perfect for organizing small parts and components",
+      "category": "Organization",
+      "tags": [
+        "boxes",
+        "modular",
+        "interlocking",
+        "organization",
+        "storage"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Networking",
+      "title": "Network Equipment Rack",
+      "description": "Custom rack system for network equipment including POE switches and patch panels",
+      "category": "Technology",
+      "tags": [
+        "networking",
+        "rack",
+        "equipment",
+        "organization"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Pendant Lamp",
+      "title": "Pleated Pendant Lamp",
+      "description": "Elegant pleated pendant lamp shade with customizable dimensions and pleating patterns",
+      "category": "Home & Decor",
+      "tags": [
+        "lamp",
+        "lighting",
+        "pendant",
+        "pleated",
+        "customizable"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "Main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Pre-Chamber Nozzle Insert",
+      "title": "Pre-Chamber Nozzle Insert",
+      "description": "Custom M14x1.25-to-M10x1.0 spark-plug pre-chamber / jet-ignition nozzle insert. Reverse-engineered starter CAD with BOSL2 helical threads, conical nozzle tip, 2.5 mm axial orifice and 2.5/1.0 mm radial jet holes. SCAD source included alongside the pre-rendered metal GLB.",
+      "category": "Engineering",
+      "tags": [
+        "spark-plug",
+        "pre-chamber",
+        "jet-ignition",
+        "BOSL2",
+        "threads",
+        "M14",
+        "M10",
+        "metal",
+        "static"
+      ],
+      "author": "Reverse-engineered starter CAD",
+      "entry": "playground.glb",
+      "type": "static",
+      "hidden": false
+    },
+    {
+      "id": "Stamp",
+      "title": "Stamp",
+      "description": "SVG-driven stamp generator using uploaded artwork",
+      "category": "Personalization",
+      "tags": [
+        "stamp",
+        "svg",
+        "text"
+      ],
+      "entry": "Main.scad",
+      "type": "scad",
+      "hidden": false
+    },
+    {
+      "id": "Vane Trap",
+      "title": "Vane Trap Device",
+      "description": "Custom vane trap mechanism with adjustable parameters",
+      "category": "Mechanical",
+      "tags": [
+        "trap",
+        "mechanism",
+        "vane",
+        "mechanical"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2024-01-01"
+    },
+    {
+      "id": "Wham",
+      "title": "Wham Project",
+      "description": "Experimental design project with customizable features",
+      "category": "Experimental",
+      "tags": [
+        "experimental",
+        "design",
+        "prototype"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": true,
+      "created": "2024-01-01"
+    }
+  ]
+}

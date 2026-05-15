@@ -29,10 +29,13 @@
   },
   "scripts": {
     "test:e2e": "jest",
+    "models:index": "node scripts/generate-models-index.mjs",
+    "prestart:development": "npm run models:index",
     "start:development": "npx webpack serve --mode=development --no-hot",
     "start:production": "NODE_ENV=production PUBLIC_URL=http://localhost:3000/dist/ npm run build && npx serve",
     "start:test": "npm run start:development",
     "start": "npm run start:development",
+    "prebuild": "npm run models:index",
     "build": "NODE_ENV=production webpack --mode=production",
     "build:libs": "LIBS_BUILD_MODE=all webpack --config webpack.libs.config.js",
     "build:libs:clean": "LIBS_BUILD_MODE=clean webpack --config webpack.libs.config.js",
