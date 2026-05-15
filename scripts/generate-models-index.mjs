@@ -59,7 +59,7 @@ function humanize(name) {
   return name.replace(/[_-]+/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
-function scanProject(name) {
+function scanProject(name, { fix }) {
   const dir = path.join(MODELS_DIR, name);
   if (!fs.statSync(dir).isDirectory()) return null;
   if (name.startsWith('.') || name === 'node_modules') return null;
@@ -105,7 +105,13 @@ function scanProject(name) {
 
   const declaredEntry = typeof projectJson.entry === 'string' ? projectJson.entry : null;
   if (declaredEntry && declaredEntry !== entry) {
-    console.warn(`[models-index] ${name}: project.json entry "${declaredEntry}" not found; using "${entry}"`);
+    if (fix && fs.existsSync(projectJsonPath)) {
+      projectJson.entry = entry;
+      fs.writeFileSync(projectJsonPath, JSON.stringify(projectJson, null, 2) + '\n');
+      console.log(`[models-index] ${name}: rewrote project.json entry "${declaredEntry}" -> "${entry}"`);
+    } else {
+      console.warn(`[models-index] ${name}: project.json entry "${declaredEntry}" not found; using "${entry}" (run with --fix to update)`);
+    }
   }
 
   const thumbnail = findThumbnail(dir, projectJson.image || projectJson.thumbnail);
@@ -132,6 +138,10 @@ function main() {
     process.exit(1);
   }
 
+  const args = new Set(process.argv.slice(2));
+  const fix = args.has('--fix');
+  const check = args.has('--check');
+
   const names = fs.readdirSync(MODELS_DIR)
     .filter((n) => !n.startsWith('.') && !n.endsWith('.json'))
     .sort();
@@ -146,7 +156,7 @@ function main() {
       continue;
     }
     if (!stat.isDirectory()) continue;
-    const project = scanProject(name);
+    const project = scanProject(name, { fix });
     if (project) projects.push(project);
   }
 
@@ -156,18 +166,32 @@ function main() {
   // index.json keeps the legacy shape (list of folder names) so older
   // consumers/bookmarks still work, but is regenerated from disk now.
   const indexJson = {
-    generatedAt: new Date().toISOString(),
     projects: projects.map((p) => p.id),
   };
 
   // manifest.json is the new single-fetch payload the gallery uses.
   const manifest = {
-    generatedAt: new Date().toISOString(),
     projects,
   };
 
-  fs.writeFileSync(path.join(MODELS_DIR, 'index.json'), JSON.stringify(indexJson, null, 2) + '\n');
-  fs.writeFileSync(path.join(MODELS_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+  const indexPath = path.join(MODELS_DIR, 'index.json');
+  const manifestPath = path.join(MODELS_DIR, 'manifest.json');
+  const indexOut = JSON.stringify(indexJson, null, 2) + '\n';
+  const manifestOut = JSON.stringify(manifest, null, 2) + '\n';
+
+  if (check) {
+    const indexCurrent = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, 'utf-8') : '';
+    const manifestCurrent = fs.existsSync(manifestPath) ? fs.readFileSync(manifestPath, 'utf-8') : '';
+    if (indexCurrent !== indexOut || manifestCurrent !== manifestOut) {
+      console.error('[models-index] Models/index.json or manifest.json is out of date. Run `npm run models:index` and commit the result.');
+      process.exit(1);
+    }
+    console.log('[models-index] index + manifest are up to date');
+    return;
+  }
+
+  fs.writeFileSync(indexPath, indexOut);
+  fs.writeFileSync(manifestPath, manifestOut);
 
   const visible = projects.filter((p) => !p.hidden).length;
   console.log(`[models-index] wrote ${projects.length} projects (${visible} visible) to Models/index.json + manifest.json`);

@@ -30,6 +30,8 @@
   "scripts": {
     "test:e2e": "jest",
     "models:index": "node scripts/generate-models-index.mjs",
+    "models:check": "node scripts/generate-models-index.mjs --check",
+    "models:fix": "node scripts/generate-models-index.mjs --fix",
     "prestart:development": "npm run models:index",
     "start:development": "npx webpack serve --mode=development --no-hot",
     "start:production": "NODE_ENV=production PUBLIC_URL=http://localhost:3000/dist/ npm run build && npx serve",

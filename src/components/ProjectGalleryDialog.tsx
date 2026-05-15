@@ -1,10 +1,45 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { ModelContext } from './contexts.ts';
 import { loadProjects, type BrowserProject } from '../state/projects-loader.ts';
 import './ProjectGalleryDialog.css';
 
 type ViewMode = 'grid' | 'kanban';
+
+// Defers the image network request until the card scrolls near the
+// viewport. Belt-and-braces on top of loading="lazy" — Safari < 16.4 and
+// some embedded webviews ignore the native hint.
+function LazyThumbnail({ src, alt }: { src: string; alt: string }) {
+  const ref = useRef<HTMLImageElement | null>(null);
+  const [visible, setVisible] = useState(() => typeof IntersectionObserver === 'undefined');
+
+  useEffect(() => {
+    if (visible) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+          return;
+        }
+      }
+    }, { rootMargin: '200px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible]);
+
+  return (
+    <img
+      ref={ref}
+      src={visible ? src : undefined}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
 
 export function ProjectGalleryDialog({
   visible,
@@ -180,11 +215,7 @@ export function ProjectGalleryDialog({
       >
         {project.image && (
           <div className="gallery-card-image">
-            <img
-              src={project.image}
-              alt={`${project.title} preview`}
-              loading="lazy"
-            />
+            <LazyThumbnail src={project.image} alt={`${project.title} preview`} />
           </div>
         )}
         <div className="gallery-card-body">
