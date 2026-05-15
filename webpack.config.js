@@ -44,6 +44,13 @@ const config = [
     // devtool: 'inline-source-map',
     module: {
       rules: [
+        // Force CommonJS parsing for webpack's hot runtime files so require("events") gets transformed.
+        // Without this, some environments treat these as ESM and leave `require` untransformed,
+        // producing "ReferenceError: require is not defined" at runtime.
+        {
+          test: /node_modules[\\/]webpack[\\/]hot[\\/].*\.js$/,
+          type: 'javascript/dynamic',
+        },
         {
           test: /\.tsx?$/,
           use: {
