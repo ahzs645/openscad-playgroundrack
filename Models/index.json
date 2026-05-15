@@ -2,15 +2,15 @@
   "projects": [
     "3D Rack SCAD",
     "Atmospheric Sampler",
-    "Keyguard with Raised Tabs",
-    "Networking",
-    "Pendant Lamp",
-    "Periodic Table",
-    "Pre-Chamber Nozzle Insert",
     "Saboteur card holder",
     "Tray Scad",
+    "Keyguard with Raised Tabs",
+    "Periodic Table",
+    "Networking",
+    "Pendant Lamp",
+    "Pre-Chamber Nozzle Insert",
+    "Stamp",
     "Vane Trap",
-    "Wham",
-    "Stamp"
+    "Wham"
   ]
 }

@@ -1,303 +1,44 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
-import { ModelContext, FSContext } from './contexts.ts';
-import { join } from '../fs/filesystem.ts';
+import { ModelContext } from './contexts.ts';
+import { loadProjects, type BrowserProject } from '../state/projects-loader.ts';
 import './ProjectGalleryDialog.css';
-
-interface BrowserProject {
-  id: string;
-  title: string;
-  description?: string;
-  category?: string;
-  tags?: string[];
-  author?: string;
-  entry: string;
-  entryPath: string;
-  type: 'scad' | 'static';
-  image?: string;
-  status?: 'ideas' | 'in-progress' | 'in-review' | 'completed';
-  hidden?: boolean;
-}
 
 type ViewMode = 'grid' | 'kanban';
 
-const MODELS_BASE_PATH = '/libraries/Models';
-const MODELS_HTTP_BASE = '/Models';
+// Defers the image network request until the card scrolls near the
+// viewport. Belt-and-braces on top of loading="lazy" — Safari < 16.4 and
+// some embedded webviews ignore the native hint.
+function LazyThumbnail({ src, alt }: { src: string; alt: string }) {
+  const ref = useRef<HTMLImageElement | null>(null);
+  const [visible, setVisible] = useState(() => typeof IntersectionObserver === 'undefined');
 
-async function fetchJSON(url: string) {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    return await response.json();
-  } catch (error) {
-    console.warn(`Failed to fetch JSON from ${url}:`, error);
-    return null;
-  }
-}
-
-async function fetchImageAsDataUrl(url: string): Promise<string | undefined> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return undefined;
-
-    const blob = await response.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    // Silently fail - 404s are expected when projects don't have thumbnails
-    return undefined;
-  }
-}
-
-async function collectProjectsHTTP(): Promise<BrowserProject[]> {
-  // Fetch the models index
-  const index = await fetchJSON(`${MODELS_HTTP_BASE}/index.json`);
-  if (!index || !Array.isArray(index.projects)) {
-    console.warn('Failed to load Models index');
-    return [];
-  }
-
-  const projects: BrowserProject[] = [];
-
-  for (const projectName of index.projects) {
-    const projectDir = `${MODELS_HTTP_BASE}/${encodeURIComponent(projectName)}`;
-    const projectJson = await fetchJSON(`${projectDir}/project.json`);
-
-    if (!projectJson) {
-      console.warn(`Failed to load project.json for ${projectName}`);
-      continue;
-    }
-
-    const projectType: 'scad' | 'static' = (projectJson.type === 'static') ? 'static' : 'scad';
-    const entry = typeof projectJson.entry === 'string' && projectJson.entry.length > 0
-      ? projectJson.entry
-      : (projectType === 'scad' ? 'main.scad' : null);
-
-    if (!entry) {
-      console.warn(`No entry file specified for project ${projectName}`);
-      continue;
-    }
-
-    const entryPath = `${MODELS_BASE_PATH}/${projectName}/${entry}`;
-
-    // Try to load thumbnail - only if specified in project.json to avoid 404 spam
-    let imageData: string | undefined;
-    const specifiedImage = projectJson.image || projectJson.thumbnail;
-    if (specifiedImage && typeof specifiedImage === 'string') {
-      const imageUrl = `${projectDir}/${encodeURIComponent(specifiedImage)}`;
-      imageData = await fetchImageAsDataUrl(imageUrl);
-    }
-
-    projects.push({
-      id: projectName,
-      title: projectJson.title ?? projectName,
-      description: projectJson.description,
-      category: projectJson.category,
-      tags: projectJson.tags,
-      author: projectJson.author,
-      entry,
-      entryPath,
-      type: projectType,
-      image: imageData,
-      status: projectJson.status,
-      hidden: projectJson.hidden === true,
-    });
-  }
-
-  return projects
-    .filter(project => !project.hidden)
-    .sort((a, b) => a.title.localeCompare(b.title));
-}
-
-function safeReadJSON(fs: FS, path: string) {
-  const bfs = fs as any;
-  try {
-    const content = bfs.readFileSync(path, 'utf-8') as string;
-    return JSON.parse(content);
-  } catch (error) {
-    console.warn(`Failed to parse JSON at ${path}:`, error);
-    return null;
-  }
-}
-
-function toDataUrl(fs: any, path: string): string | undefined {
-  try {
-    const data = fs.readFileSync(path) as Uint8Array;
-    const ext = path.split('.').pop()?.toLowerCase();
-    if (!ext) return undefined;
-
-    if (ext === 'svg') {
-      const text = new TextDecoder().decode(data);
-      return `data:image/svg+xml;utf8,${encodeURIComponent(text)}`;
-    }
-
-    const mime =
-      ext === 'png' ? 'image/png'
-      : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
-      : ext === 'webp' ? 'image/webp'
-      : undefined;
-
-    if (!mime) return undefined;
-
-    let binary = '';
-    for (let i = 0; i < data.length; i += 1) {
-      binary += String.fromCharCode(data[i]);
-    }
-    const base64 = btoa(binary);
-    return `data:${mime};base64,${base64}`;
-  } catch (error) {
-    console.warn('Failed to read preview asset', path, error);
-    return undefined;
-  }
-}
-
-function findDefaultEntry(fs: FS, directory: string) {
-  const bfs = fs as any;
-  try {
-    const entries = bfs.readdirSync(directory) as string[];
-    for (const name of entries) {
-      if (name.startsWith('.')) continue;
-      if (!name.toLowerCase().endsWith('.scad')) continue;
-      const fullPath = join(directory, name);
-      try {
-        const stat = bfs.lstatSync(fullPath);
-        if (stat.isFile()) {
-          return name;
+  useEffect(() => {
+    if (visible) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+          return;
         }
-      } catch (error) {
-        console.warn(`Failed to inspect ${fullPath}:`, error);
       }
-    }
-  } catch (error) {
-    console.warn(`Failed to enumerate ${directory}:`, error);
-  }
-  return null;
-}
+    }, { rootMargin: '200px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible]);
 
-function collectProjects(fs: FS): BrowserProject[] {
-  const bfs = fs as any;
-  let entries: string[] = [];
-  try {
-    entries = bfs.readdirSync(MODELS_BASE_PATH) as string[];
-  } catch (error) {
-    console.warn('Models archive not mounted:', error);
-    return [];
-  }
-
-  const projects: BrowserProject[] = [];
-
-  for (const name of entries) {
-    if (name.startsWith('.')) continue;
-
-    const projectDir = join(MODELS_BASE_PATH, name);
-    let stats;
-    try {
-      stats = bfs.lstatSync(projectDir);
-    } catch (error) {
-      console.warn(`Failed to stat ${projectDir}:`, error);
-      continue;
-    }
-    if (!stats.isDirectory()) {
-      continue;
-    }
-
-    const projectJson = safeReadJSON(fs, join(projectDir, 'project.json')) ?? {};
-    const projectType: 'scad' | 'static' = (projectJson.type === 'static') ? 'static' : 'scad';
-    let entry = typeof projectJson.entry === 'string' && projectJson.entry.length > 0
-      ? projectJson.entry
-      : undefined;
-    let entryPath = entry ? join(projectDir, entry) : undefined;
-
-    if (projectType === 'scad') {
-      const ensureScadFile = () => {
-        if (!entryPath) return false;
-        try {
-          const stat = bfs.lstatSync(entryPath);
-          if (!stat.isFile()) {
-            return false;
-          }
-          if (!entryPath.toLowerCase().endsWith('.scad')) {
-            return false;
-          }
-          return true;
-        } catch {
-          return false;
-        }
-      };
-
-      if (!ensureScadFile()) {
-        entry = findDefaultEntry(fs, projectDir) ?? entry;
-        entryPath = entry ? join(projectDir, entry) : undefined;
-      }
-
-      if (!ensureScadFile()) {
-        console.warn(`No entry SCAD file found for project ${name}`);
-        continue;
-      }
-    } else {
-      if (!entryPath) {
-        console.warn(`Static project ${name} is missing entry file in project.json`);
-        continue;
-      }
-      try {
-        const stat = bfs.lstatSync(entryPath);
-        if (!stat.isFile()) {
-          console.warn(`Entry for static project ${name} is not a file: ${entryPath}`);
-          continue;
-        }
-      } catch (error) {
-        console.warn(`Unable to read entry for static project ${name}:`, error);
-        continue;
-      }
-    }
-
-    if (!entry || !entryPath) {
-      console.warn(`No entry file found for project ${name}`);
-      continue;
-    }
-
-    const imageCandidates: string[] = [];
-    if (typeof projectJson.image === 'string') imageCandidates.push(projectJson.image);
-    if (typeof projectJson.thumbnail === 'string') imageCandidates.push(projectJson.thumbnail);
-    imageCandidates.push('thumbnail.png', 'thumbnail.jpg', 'thumbnail.jpeg', 'thumbnail.webp', 'thumbnail.svg');
-
-    let imageData: string | undefined;
-    for (const candidate of imageCandidates) {
-      const candidatePath = join(projectDir, candidate);
-      try {
-        const candidateStats = bfs.lstatSync(candidatePath);
-        if (candidateStats.isFile()) {
-          imageData = toDataUrl(bfs, candidatePath);
-          if (imageData) break;
-        }
-      } catch {
-        // ignore missing preview assets
-      }
-    }
-
-    projects.push({
-      id: name,
-      title: projectJson.title ?? name,
-      description: projectJson.description,
-      category: projectJson.category,
-      tags: projectJson.tags,
-      author: projectJson.author,
-      entry,
-      entryPath,
-      type: projectType,
-      image: imageData,
-      status: projectJson.status,
-      hidden: projectJson.hidden === true,
-    });
-  }
-
-  // Filter out hidden projects and sort by title
-  return projects
-    .filter(project => !project.hidden)
-    .sort((a, b) => a.title.localeCompare(b.title));
+  return (
+    <img
+      ref={ref}
+      src={visible ? src : undefined}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+    />
+  );
 }
 
 export function ProjectGalleryDialog({
@@ -314,7 +55,6 @@ export function ProjectGalleryDialog({
   mode?: 'embedded' | 'standalone';
 }) {
   const model = useContext(ModelContext);
-  const fs = useContext(FSContext);
 
   // Check if Kanban view is enabled via environment variable
   const envKanban = (typeof process !== 'undefined' && process.env?.PLAYGROUND_KANBAN_ENABLED ? process.env.PLAYGROUND_KANBAN_ENABLED : '').toLowerCase();
@@ -346,17 +86,12 @@ export function ProjectGalleryDialog({
 
   useEffect(() => {
     if (!visible) return;
-    if (!fs) {
-      setError('File system is not ready yet.');
-      setProjects([]);
-      return;
-    }
 
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    collectProjectsHTTP().then((scanned) => {
+    loadProjects().then((scanned) => {
       if (!cancelled) {
         setProjects(scanned);
         if (scanned.length === 0) {
@@ -376,7 +111,7 @@ export function ProjectGalleryDialog({
     return () => {
       cancelled = true;
     };
-  }, [visible, fs]);
+  }, [visible]);
 
   useEffect(() => {
     if (!visible) {
@@ -480,11 +215,7 @@ export function ProjectGalleryDialog({
       >
         {project.image && (
           <div className="gallery-card-image">
-            <img
-              src={project.image}
-              alt={`${project.title} preview`}
-              loading="lazy"
-            />
+            <LazyThumbnail src={project.image} alt={`${project.title} preview`} />
           </div>
         )}
         <div className="gallery-card-body">

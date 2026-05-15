@@ -19,7 +19,8 @@ import { zipArchives } from '../fs/zip-archives.ts';
 const isMonacoSupported = (() => {
   const ua = window.navigator.userAgent;
   const iosWk = ua.match(/iPad|iPhone/i) && ua.match(/WebKit/i);
-  return !iosWk;
+  const android = ua.match(/Android/i);
+  return !(iosWk || android);
 })();
 
 export default function EditorPanel({className, style}: {className?: string, style?: CSSProperties}) {

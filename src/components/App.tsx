@@ -3,14 +3,15 @@
 import React, { CSSProperties, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import {MultiLayoutComponentId, State, StatePersister} from '../state/app-state'
 import { Model } from '../state/model';
-import ViewerPanel from './ViewerPanel';
 import Footer from './Footer';
 import { ModelContext, FSContext } from './contexts';
 import PanelSwitcher from './PanelSwitcher';
 import { ProjectGalleryDialog } from './ProjectGalleryDialog';
 
-// Lazy load EditorPanel only when editor is enabled
+// Heavy panels are split out so the landing/gallery view ships without them.
 const EditorPanel = lazy(() => import('./EditorPanel'));
+const ViewerPanel = lazy(() => import('./ViewerPanel'));
+const CustomizerPanel = lazy(() => import('./CustomizerPanel'));
 
 declare global {
   interface Window {
@@ -22,7 +23,6 @@ declare global {
   }
 }
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import CustomizerPanel from './CustomizerPanel';
 
 
 type UIConfig = {
@@ -366,13 +366,17 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
                 `} style={getPanelStyle('editor')} />
               </Suspense>
             )}
-            <ViewerPanel className={layout.mode === 'single' ? `absolute-fill` : ''} style={getPanelStyle('viewer')} />
+            <Suspense fallback={<div style={getPanelStyle('viewer')} className="flex align-items-center justify-content-center">Loading viewer...</div>}>
+              <ViewerPanel className={layout.mode === 'single' ? `absolute-fill` : ''} style={getPanelStyle('viewer')} />
+            </Suspense>
             {!isStaticProject && (
-              <CustomizerPanel className={`
-              opacity-animated
-              ${layout.mode === 'single' && layout.focus !== 'customizer' ? 'opacity-0' : ''}
-              ${layout.mode === 'single' ? `absolute-fill` : ''}
-            `} style={getPanelStyle('customizer')} />
+              <Suspense fallback={<div style={getPanelStyle('customizer')} className="flex align-items-center justify-content-center">Loading customizer...</div>}>
+                <CustomizerPanel className={`
+                opacity-animated
+                ${layout.mode === 'single' && layout.focus !== 'customizer' ? 'opacity-0' : ''}
+                ${layout.mode === 'single' ? `absolute-fill` : ''}
+              `} style={getPanelStyle('customizer')} />
+              </Suspense>
             )}
           </div>
 
