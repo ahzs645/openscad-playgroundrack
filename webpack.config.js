@@ -44,13 +44,6 @@ const config = [
     // devtool: 'inline-source-map',
     module: {
       rules: [
-        // Force CommonJS parsing for webpack's hot runtime files so require("events") gets transformed.
-        // Without this, some environments treat these as ESM and leave `require` untransformed,
-        // producing "ReferenceError: require is not defined" at runtime.
-        {
-          test: /node_modules[\\/]webpack[\\/]hot[\\/].*\.js$/,
-          type: 'javascript/dynamic',
-        },
         {
           test: /\.tsx?$/,
           use: {
@@ -127,6 +120,13 @@ const config = [
       // json-url's stream codec dynamically imports node:zlib behind a process.versions?.node guard
       // that never matches in the browser. Mark the scheme as external so webpack doesn't try to bundle it.
       new webpack.IgnorePlugin({ resourceRegExp: /^node:zlib$/ }),
+      // webpack-dev-server's client pulls in webpack/hot/emitter.js, which contains `require("events")`.
+      // In some local toolchains that line ends up untransformed (browser then throws
+      // "ReferenceError: require is not defined"). Swap in a tiny CJS shim that needs no Node modules.
+      new webpack.NormalModuleReplacementPlugin(
+        /[\\/]webpack[\\/]hot[\\/]emitter\.js$/,
+        path.resolve(__dirname, 'scripts/dev-emitter-shim.cjs'),
+      ),
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(isDev ? 'development' : 'production'),
         'process.env.PLAYGROUND_EDITOR_ENABLED': JSON.stringify(process.env.PLAYGROUND_EDITOR_ENABLED || ''),
