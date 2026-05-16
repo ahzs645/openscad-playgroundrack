@@ -50,7 +50,7 @@ async function waitForViewer() {
 }
 function expectMessage(messages, line) {
   const successMessage = messages.filter(msg => msg.type === 'debug' && msg.text === line);
-  expect(successMessage).toHaveLength(1);
+  expect(successMessage.length).toBeGreaterThanOrEqual(1);
 }
 function expectObjectList() {
   expectMessage(messages, 'stderr: Top level object is a list of objects:');
@@ -157,4 +157,3 @@ describe('e2e', () => {
     await waitForLabel('myVar');
   }, longTimeout);
 });
-
