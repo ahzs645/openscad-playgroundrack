@@ -58,9 +58,7 @@ $fs = 0.25;
 // -------------------------
 
 /* [Dimension preset] */
-// Choose which hex/collar dimensions to use.
-//   original  = earlier/wrong assumption: 3/4" hex, 21.5 mm collar OD estimate.
-//   corrected = customer email correction: 5/8" hex, 0.73" collar OD.
+// Choose which hex/collar dimensions to use. Corrected uses 5/8" hex and 0.73" collar OD.
 dimension_preset = "corrected"; // [original, corrected]
 
 /* [Threads] */
