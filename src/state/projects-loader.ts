@@ -2,6 +2,8 @@
 // falls back to the legacy index.json + per-project.json walk. The result
 // is cached at module scope so reopening the gallery is instant.
 
+import { httpAssetPath } from '../utils.ts';
+
 export interface BrowserProject {
   id: string;
   title: string;
@@ -18,7 +20,7 @@ export interface BrowserProject {
 }
 
 const MODELS_BASE_PATH = '/libraries/Models';
-const MODELS_HTTP_BASE = '/Models';
+const MODELS_HTTP_BASE = httpAssetPath('Models');
 
 let cache: BrowserProject[] | null = null;
 let inflight: Promise<BrowserProject[]> | null = null;
