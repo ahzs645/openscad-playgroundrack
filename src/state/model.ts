@@ -4,7 +4,7 @@ import { checkSyntax, render, RenderArgs, RenderOutput } from "../runner/actions
 import { MultiLayoutComponentId, SingleLayoutComponentId, State, StatePersister } from "./app-state.ts";
 import { VALID_EXPORT_FORMATS_2D, VALID_EXPORT_FORMATS_3D } from './formats.ts';
 import { bubbleUpDeepMutations } from "./deep-mutate.ts";
-import { downloadUrl, fetchSource, formatBytes, formatMillis, readFileAsDataURL } from '../utils.ts'
+import { downloadUrl, fetchSource, formatBytes, formatMillis, readFileAsDataURL, httpAssetPath } from '../utils.ts'
 
 import JSZip from 'jszip';
 import { ProcessStreams } from "../runner/openscad-runner.ts";
@@ -215,7 +215,7 @@ export class Model {
     // Pre-fetch Models files via HTTP if needed
     let preFetchedContent: string | null = null;
     if (path.startsWith('/libraries/Models/')) {
-      const httpPath = path.replace('/libraries/Models/', '/Models/');
+      const httpPath = path.replace('/libraries/Models/', httpAssetPath('Models/'));
       try {
         const response = await fetch(httpPath);
         if (response.ok) {
@@ -391,7 +391,7 @@ export class Model {
         return;
       }
 
-      const url = resourcePath.replace('/libraries/Models/', '/Models/');
+      const url = resourcePath.replace('/libraries/Models/', httpAssetPath('Models/'));
       extraSources.push({ path: resourcePath, url });
     };
 
@@ -739,7 +739,7 @@ export class Model {
 
     // Check if this is a Models file - fetch from HTTP instead of BrowserFS
     if (entryPath.startsWith('/libraries/Models/')) {
-      const httpPath = entryPath.replace('/libraries/Models/', '/Models/');
+      const httpPath = entryPath.replace('/libraries/Models/', httpAssetPath('Models/'));
       try {
         const response = await fetch(httpPath);
         if (!response.ok) {

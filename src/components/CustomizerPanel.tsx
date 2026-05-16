@@ -11,7 +11,7 @@ import { InputText } from 'primereact/inputtext';
 import { Fieldset } from 'primereact/fieldset';
 import { Parameter } from '../state/customizer-types.ts';
 import { Button } from 'primereact/button';
-import { readFileAsDataURL } from '../utils.ts';
+import { readFileAsDataURL, httpAssetPath } from '../utils.ts';
 
 type PresetData = {
   fileFormatVersion: string;
@@ -52,7 +52,7 @@ export default function CustomizerPanel({className, style}: {className?: string,
 
     // For Models loaded from HTTP, fetch Main.json via HTTP
     if (activePath.startsWith('/libraries/Models/')) {
-      const httpDirectory = directory.replace('/libraries/Models/', '/Models/');
+      const httpDirectory = directory.replace('/libraries/Models/', httpAssetPath('Models/'));
       const httpMainJsonPath = `${httpDirectory}/Main.json`;
       const httpMainJsonPathAlt = `${httpDirectory}/main.json`;
 

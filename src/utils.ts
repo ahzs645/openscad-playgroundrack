@@ -152,6 +152,25 @@ export function isInStandaloneMode() {
   return Boolean(('standalone' in window.navigator) && (window.navigator.standalone));
 }
 
+// Directory portion of the current document's URL, e.g. `/` locally or
+// `/openscad-playgroundrack/` when deployed under a GitHub Pages sub-path.
+// Used to prefix HTTP fetches for assets shipped alongside index.html so the
+// app works at any base URL without build-time configuration.
+export const HTTP_BASE_PATH: string = (() => {
+  if (typeof document === 'undefined') return '/';
+  try {
+    return new URL('./', document.baseURI).pathname;
+  } catch {
+    return '/';
+  }
+})();
+
+// Joins HTTP_BASE_PATH with a relative path, ensuring exactly one slash between.
+export function httpAssetPath(relativePath: string): string {
+  const cleaned = relativePath.replace(/^\/+/, '');
+  return `${HTTP_BASE_PATH}${cleaned}`;
+}
+
 export function downloadUrl(url: string, filename: string) {
   const link = document.createElement('a');
   link.href = url;

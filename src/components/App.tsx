@@ -8,6 +8,7 @@ import { ModelContext, FSContext } from './contexts';
 import PanelSwitcher from './PanelSwitcher';
 import { ProjectGalleryDialog } from './ProjectGalleryDialog';
 import { readShareFromQuery, stripShareFromUrl } from '../state/share-link';
+import { httpAssetPath } from '../utils';
 
 // Heavy panels are split out so the landing/gallery view ships without them.
 const EditorPanel = lazy(() => import('./EditorPanel'));
@@ -195,7 +196,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
     // Handle model parameter from URL
     if (modelParam) {
       const modelPath = `/libraries/Models/${modelParam}`;
-      const httpModelPath = `/Models/${encodeURIComponent(modelParam)}`;
+      const httpModelPath = httpAssetPath(`Models/${encodeURIComponent(modelParam)}`);
 
       (async () => {
         let opened = false;
