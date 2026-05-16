@@ -31,6 +31,18 @@ PrimeReact.hideOverlaysOnDocumentScrolling = false;
 
 const log = debug('app:log');
 
+function initialHashNeedsFullLibraryMount() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const hash = window.location.hash;
+  if (!hash.startsWith('#path=')) {
+    return false;
+  }
+  const path = decodeURIComponent(hash.substring('#path='.length));
+  return path.startsWith('/libraries/');
+}
+
 if (nodeEnv !== 'production') {
   debug.enable('*');
   log('Logging is enabled!');
@@ -103,7 +115,11 @@ async function bootstrap() {
   const urlStateEnabled = false;
 
   // Only load critical archives upfront - others will be loaded by OpenSCAD worker when needed
-  const { fs } = await createEditorFS({prefix: '/libraries/', allowPersistence: isInStandaloneMode(), onlyMountCritical: true});
+  const { fs } = await createEditorFS({
+    prefix: '/libraries/',
+    allowPersistence: isInStandaloneMode(),
+    onlyMountCritical: !initialHashNeedsFullLibraryMount(),
+  });
 
   const seedDefaultSource = () => {
     try {
@@ -121,6 +137,7 @@ async function bootstrap() {
 
   let statePersister: StatePersister;
   let persistedState: State | null = null;
+  let shouldClearInitialHash = false;
 
   if (!editorEnabled) {
     statePersister = {
@@ -141,18 +158,17 @@ async function bootstrap() {
       }
     };
   } else {
+    persistedState = await readStateFromFragment();
     if (urlStateEnabled) {
-      persistedState = await readStateFromFragment();
       statePersister = {
         set: writeStateInFragment,
       };
     } else {
-      persistedState = null;
       statePersister = {
         set: async () => {},
       };
       if (typeof window !== 'undefined' && typeof history !== 'undefined') {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
+        shouldClearInitialHash = window.location.hash.length > 1;
       }
     }
   }
@@ -167,6 +183,12 @@ async function bootstrap() {
       <App initialState={initialState} statePersister={statePersister} fs={fs} />
     </React.StrictMode>
   );
+
+  if (shouldClearInitialHash) {
+    window.setTimeout(() => {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }, 0);
+  }
 }
 
 // Start bootstrapping as soon as the DOM is ready, without waiting for all resources
