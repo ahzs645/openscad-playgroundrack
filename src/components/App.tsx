@@ -138,11 +138,16 @@ function applyUIConfigToState(state: State, config: UIConfig): State {
         result.view.layout.viewer = true;
       }
     } else {
+      // On mobile (single mode), always default to the viewer so users see the
+      // 3D model first. The customizer remains one tap away.
       if (!config.editorEnabled && result.view.layout.focus === 'editor') {
         result.view.layout.focus = 'viewer';
       }
-      result.view.layout.focus = 'customizer';
     }
+  }
+
+  if (result.view.layout.mode === 'single' && result.view.layout.focus === 'customizer') {
+    result.view.layout.focus = 'viewer';
   }
 
   return result;
