@@ -142,7 +142,7 @@
     {
       "id": "Pre-Chamber Nozzle Insert",
       "title": "Pre-Chamber Nozzle Insert",
-      "description": "Custom M14x1.25-to-M10x1.0 spark-plug pre-chamber / jet-ignition nozzle insert. Reverse-engineered starter CAD with BOSL2 helical threads, conical nozzle tip, 2.5 mm axial orifice and 2.5/1.0 mm radial jet holes. SCAD source included alongside the pre-rendered metal GLB.",
+      "description": "Custom M14x1.25-to-M10x1.0 spark-plug pre-chamber / jet-ignition nozzle insert. Reverse-engineered starter CAD with BOSL2 helical threads, selectable original/corrected hex and collar dimensions, conical nozzle tip, 2.5 mm axial orifice, and angled 2.5/1.0 mm side jet holes. SCAD source included alongside the pre-rendered metal GLB.",
       "category": "Engineering",
       "tags": [
         "spark-plug",
