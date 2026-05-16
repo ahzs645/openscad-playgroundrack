@@ -280,6 +280,11 @@ export class Model {
         if (previousLogsVisible !== undefined) {
           s.view.logs = previousLogsVisible;
         }
+        // On mobile, opening a project should land on the viewer so the user
+        // sees the 3D model first; the customizer is one tap away.
+        if (s.view.layout.mode === 'single' && s.view.layout.focus === 'customizer') {
+          s.view.layout.focus = 'viewer';
+        }
         s.lastCheckerRun = undefined;
         s.output = undefined;
         s.export = undefined;

@@ -39,7 +39,16 @@
         margin: 0;
 
         height: 100vh;
+        height: 100dvh;
         height: var(--app-height);
+      }
+
+      /* Prevent iOS double-tap zoom delay on interactive controls and avoid
+         the bottom browser chrome from swallowing taps on footer buttons. */
+      button,
+      .p-button,
+      .p-tabmenuitem {
+        touch-action: manipulation;
       }
 
       .p-tabmenu-nav {

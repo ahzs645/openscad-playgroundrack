@@ -129,11 +129,21 @@ export function formatMillis(n: number) {
 }
 
 // https://medium.com/quick-code/100vh-problem-with-ios-safari-92ab23c852a8
+// On iOS Chrome the URL/toolbar UI can overlap the bottom of the page, hiding
+// the footer Render button. window.innerHeight only updates on `resize`, which
+// fires inconsistently when the toolbar collapses, so also listen to
+// visualViewport changes and re-measure on orientation/scroll.
 export function registerCustomAppHeightCSSProperty() {
   const updateAppHeight = () => {
-    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)
+    const height = window.visualViewport?.height ?? window.innerHeight;
+    document.documentElement.style.setProperty('--app-height', `${height}px`)
   }
   window.addEventListener('resize', updateAppHeight)
+  window.addEventListener('orientationchange', updateAppHeight)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateAppHeight)
+    window.visualViewport.addEventListener('scroll', updateAppHeight)
+  }
   updateAppHeight();
 }
 
