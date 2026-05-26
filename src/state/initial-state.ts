@@ -38,6 +38,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
         features: [],
         exportFormat2D: 'svg',
         exportFormat3D: 'stl',
+        occtStepExportArch: '32',
       },
       view: {
         layout: {
@@ -72,6 +73,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
   }
 
   initialState.view.showAxes ??= true;
+  initialState.params.occtStepExportArch ??= '32';
 
   // fs.writeFile(initialState.params.sourcePath, initialState.params.source);
   // if (initialState.params.sourcePath !== defaultSourcePath) {

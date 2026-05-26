@@ -12,6 +12,7 @@ export const VALID_EXPORT_FORMATS_3D = {
   'off': true,
   'glb': true,
   '3mf': true,
+  'step': true,
 };
 
 export function is2DFormatExtension(ext: string) {

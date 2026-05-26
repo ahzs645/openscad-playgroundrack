@@ -97,6 +97,12 @@ export class Model {
       if (exportFormat3D != null) s.params.exportFormat3D = exportFormat3D;
     });
   }
+
+  setOcctStepExportArch(arch: NonNullable<State['params']['occtStepExportArch']>) {
+    this.mutate(s => {
+      s.params.occtStepExportArch = arch;
+    });
+  }
   setVar(name: string, value: any) {
     if (this.state.project?.type === 'static') {
       return;
@@ -504,6 +510,34 @@ export class Model {
         output = {
           outFile: new File([exportedData], this.state.output.outFile.name.replace('.off', '.3mf')),
           elapsedMillis,
+          logText: '',
+          markers: [],
+        };
+      } else if (exportFormat === 'step') {
+        const start = performance.now();
+        const { exportStepFromCsg, exportStepFromMesh } = await import(/* webpackChunkName: "export-step" */ "../io/export_step.ts");
+        const arch = this.state.params.occtStepExportArch ?? '32';
+        let stepText: string;
+        try {
+          const csgOutput = await render({
+            mountArchives: true,
+            scadPath: this.state.params.activePath,
+            sources: this.state.params.sources,
+            vars: this.state.params.vars,
+            extraArgs: [],
+            isPreview: false,
+            features,
+            renderFormat: 'csg',
+            streamsCallback: ps => console.log('STEP CSG export', JSON.stringify(ps)),
+          })({now: true});
+          stepText = await exportStepFromCsg(await csgOutput.outFile.text(), arch);
+        } catch (exactError) {
+          console.warn('Exact OCCT STEP export failed; falling back to tessellated mesh STEP.', exactError);
+          stepText = await exportStepFromMesh(parseOff(await this.state.output.outFile.text()), arch);
+        }
+        output = {
+          outFile: new File([stepText], this.state.output.outFile.name.replace(/\.[^.]+$/, '.step'), {type: 'model/step'}),
+          elapsedMillis: performance.now() - start,
           logText: '',
           markers: [],
         };

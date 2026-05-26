@@ -1,6 +1,7 @@
 node_modules
 libs
 dist
+tmp
 public/libraries
 public/openscad.js
 public/openscad.wasm

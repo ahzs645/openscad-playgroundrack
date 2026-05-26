@@ -32,6 +32,7 @@ export interface State {
     features: string[],
     exportFormat2D: keyof typeof VALID_EXPORT_FORMATS_2D,
     exportFormat3D: keyof typeof VALID_EXPORT_FORMATS_3D,
+    occtStepExportArch?: '32' | '64-mt',
     extruderColors?: string[],
   },
 

@@ -5,6 +5,7 @@
   "type": "module",
   "homepage": "https://ochafik.com/openscad2/",
   "dependencies": {
+    "@bitbybit-dev/occt": "^1.0.2",
     "@firstform/json-url": "^4.1.0",
     "@gltf-transform/core": "^4.1.1",
     "@gltf-transform/extensions": "^4.1.1",

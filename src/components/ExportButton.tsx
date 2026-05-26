@@ -57,6 +57,26 @@ export default function ExportButton({className, style}: {className?: string, st
           command: () => model!.setFormats(undefined, '3mf'),
         },
         {
+          data: 'step',
+          buttonLabel: 'Download STEP',
+          label: 'STEP via OCCT (32-bit)',
+          icon: 'pi pi-file-export',
+          command: () => {
+            model!.setOcctStepExportArch('32');
+            model!.setFormats(undefined, 'step');
+          },
+        },
+        {
+          data: 'step-64-mt',
+          buttonLabel: 'Download STEP',
+          label: 'STEP via OCCT (64-bit multithreaded)',
+          icon: 'pi pi-server',
+          command: () => {
+            model!.setOcctStepExportArch('64-mt');
+            model!.setFormats(undefined, 'step');
+          },
+        },
+        {
           separator: true
         },
         {

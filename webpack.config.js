@@ -1,4 +1,5 @@
 import CopyPlugin from 'copy-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import WorkboxPlugin from 'workbox-webpack-plugin';
 
@@ -45,6 +46,12 @@ const config = [
     module: {
       rules: [
         {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
+        {
           test: /\.tsx?$/,
           use: {
             loader: 'ts-loader',
@@ -53,7 +60,7 @@ const config = [
               compilerOptions: {
                 module: 'esnext',
                 moduleResolution: 'node',
-                target: 'ES2022',
+                target: 'ES2020',
                 lib: ['WebWorker', 'ES2022'],
                 sourceMap: isDev,
                 inlineSources: isDev
@@ -85,6 +92,8 @@ const config = [
         fs: false,
         path: false,
         crypto: false,
+        module: false,
+        worker_threads: false,
       },
     },
     node: {
@@ -95,7 +104,27 @@ const config = [
     },
     output: {
       filename: 'index.js',
+      chunkFilename: '[name].index.js',
       path: path.resolve(__dirname, 'dist'),
+    },
+    optimization: {
+      minimizer: [
+        new TerserPlugin({
+          exclude: /export-step\.index\.js$/,
+          terserOptions: {
+            ecma: 2022,
+            parse: {
+              ecma: 2022,
+            },
+            compress: {
+              ecma: 2022,
+            },
+            format: {
+              ecma: 2022,
+            },
+          },
+        }),
+      ],
     },
     devServer: {
       static: [
@@ -134,6 +163,7 @@ const config = [
         'process.env.PLAYGROUND_CUSTOMIZER_OPEN': JSON.stringify(process.env.PLAYGROUND_CUSTOMIZER_OPEN || ''),
         'process.env.PLAYGROUND_KANBAN_ENABLED': JSON.stringify(process.env.PLAYGROUND_KANBAN_ENABLED || ''),
         'process.env.PLAYGROUND_URL_STATE_ENABLED': JSON.stringify(process.env.PLAYGROUND_URL_STATE_ENABLED || ''),
+        'globalThis.process': JSON.stringify({}),
       }),
       ...(process.env.NODE_ENV === 'production' ? [
         new WorkboxPlugin.GenerateSW({

@@ -85,7 +85,7 @@ export type RenderArgs = {
   extraArgs?: string[],
   isPreview: boolean,
   mountArchives: boolean,
-  renderFormat: keyof typeof VALID_EXPORT_FORMATS_2D | keyof typeof VALID_EXPORT_FORMATS_3D,
+  renderFormat: keyof typeof VALID_EXPORT_FORMATS_2D | keyof typeof VALID_EXPORT_FORMATS_3D | 'csg',
   streamsCallback: (ps: ProcessStreams) => void,
 }
 
@@ -128,11 +128,15 @@ export const render =
     const actualRenderFormat = renderFormat == 'glb' || renderFormat == '3mf' ? 'off' : renderFormat;
     const stem = scadPath.replace(/\.scad$/, '').split('/').pop();
     const outFile = `${stem}.${actualRenderFormat}`;
+    const outputPath = actualRenderFormat === 'csg' ? `/${outFile}` : outFile;
+    const exportFormatArgs = actualRenderFormat === 'csg'
+      ? []
+      : ["--export-format=" + (actualRenderFormat == 'stl' ? 'binstl' : actualRenderFormat)];
     const args = [
       scadPath,
-      "-o", outFile,
-      "--backend=manifold",
-      "--export-format=" + (actualRenderFormat == 'stl' ? 'binstl' : actualRenderFormat),
+      "-o", outputPath,
+      ...(actualRenderFormat === 'csg' ? [] : ["--backend=manifold"]),
+      ...exportFormatArgs,
       ...(Object.entries(vars ?? {}).flatMap(([k, v]) => [`-D${k}=${formatValue(v)}`])),
       ...(features ?? []).map(f => `--enable=${f}`),
       ...(extraArgs ?? [])
@@ -142,7 +146,7 @@ export const render =
       mountArchives: mountArchives,
       inputs: sources.map(s => s.path === scadPath ? {path: s.path, content} : s),
       args,
-      outputPaths: [outFile],
+      outputPaths: [outputPath],
     }, streamsCallback);
 
     return AbortablePromise<RenderOutput>((resolve, reject) => {
@@ -185,4 +189,3 @@ export const render =
       return () => job.kill()
     });
   });
-
