@@ -122,6 +122,23 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Parametric Gel Comb",
+      "title": "Parametric Gel Comb",
+      "description": "Customizable gel comb with adjustable tooth count, tooth dimensions, ridges, slots, and side hooks",
+      "category": "Lab Equipment",
+      "tags": [
+        "gel-comb",
+        "lab",
+        "parametric",
+        "customizable"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.scad",
+      "type": "scad",
+      "hidden": false,
+      "created": "2026-05-29"
+    },
+    {
       "id": "Pendant Lamp",
       "title": "Pleated Pendant Lamp",
       "description": "Elegant pleated pendant lamp shade with customizable dimensions and pleating patterns",
