@@ -7,6 +7,7 @@ v5 changes:
 - Text remains disabled by default.
 - Keeps bottom_ridge_gap_from_teeth for spacing the lower ridge above the tooth roots.
 - Adds adjustable angled side hooks / small end teeth.
+- Adds independent tooth and bar thickness controls.
 */
 
 $fn = 48;
@@ -15,11 +16,12 @@ $fn = 48;
 tooth_count         = 38;
 tooth_length        = 20.0;
 tooth_width         = 4.0;
+tooth_thickness     = 0.7;
 tooth_gap           = 2.2;
 tooth_corner_radius = 0.35;
 
 // ---------- Main body ----------
-plate_thickness     = 1.0;    // Core sheet thickness, not counting raised ridge thickness
+bar_thickness       = 1.0;    // Main bar sheet thickness, not counting raised ridge thickness
 side_overhang       = 5.0;    // Extra body width beyond first/last tooth
 bar_height          = 18.0;   // Height above the teeth
 body_corner_radius  = 0.6;
@@ -62,7 +64,7 @@ show_front_ridges       = true;
 show_back_ridges        = false;   // Set true only if you want ridges on both faces
 
 // Front/back thickness is the amount each ridge protrudes OUTWARD from its face.
-front_ridge_thickness   = 0.20;    // Starts at Z = plate_thickness
+front_ridge_thickness   = 0.20;    // Starts at Z = bar_thickness
 back_ridge_thickness    = 0.20;    // Starts at Z = 0 and goes negative
 
 // Top/bottom control the visible height of the ridge bands in Y.
@@ -114,6 +116,8 @@ if (slot_count > 0 && slot_group_width > bar_width)
     echo("WARNING: slot group is wider than the bar. Reduce slot_count, slot_width_manual, or slot_gap.");
 if (front_ridge_thickness < 0 || back_ridge_thickness < 0)
     echo("WARNING: ridge thickness values should be >= 0.");
+if (tooth_thickness <= 0 || bar_thickness <= 0)
+    echo("WARNING: tooth_thickness and bar_thickness should be > 0.");
 if (bottom_ridge_gap_from_teeth < 0)
     echo("WARNING: bottom_ridge_gap_from_teeth should be >= 0.");
 if (bottom_ridge_gap_from_teeth + bottom_ridge_height > bar_height)
@@ -180,12 +184,14 @@ module side_hook_2d(side = -1, angle_deg = 0, extra_outward = 0) {
     rounded_polygon_2d(pts, hook_radius);
 }
 
-module comb_outline_2d() {
-    union() {
-        // Main upper bar.
-        translate([-bar_width / 2, 0])
-            rounded_rect_2d(bar_width, bar_height, body_corner_radius);
+module bar_outline_2d() {
+    // Main upper bar.
+    translate([-bar_width / 2, 0])
+        rounded_rect_2d(bar_width, bar_height, body_corner_radius);
+}
 
+module teeth_outline_2d() {
+    union() {
         // Downward teeth.
         for (i = [0 : tooth_count - 1])
             let (x = -teeth_span / 2 + i * tooth_pitch)
@@ -197,6 +203,13 @@ module comb_outline_2d() {
             side_hook_2d(-1, left_hook_angle_degrees,  hook_tip_outward_extra);
             side_hook_2d( 1, right_hook_angle_degrees, hook_tip_outward_extra);
         }
+    }
+}
+
+module comb_outline_2d() {
+    union() {
+        bar_outline_2d();
+        teeth_outline_2d();
     }
 }
 
@@ -212,6 +225,13 @@ module slot_cutouts_2d() {
 module comb_face_2d() {
     difference() {
         comb_outline_2d();
+        slot_cutouts_2d();
+    }
+}
+
+module bar_face_2d() {
+    difference() {
+        bar_outline_2d();
         slot_cutouts_2d();
     }
 }
@@ -260,7 +280,7 @@ module face_ridges_3d(face = "front", thickness = 0.2) {
         // One-sided placement:
         // front: sits on +Z face and goes outward
         // back : sits on -Z face and goes outward in negative Z
-        z_start = face == "front" ? plate_thickness : -thickness;
+        z_start = face == "front" ? bar_thickness : -thickness;
 
         translate([0, 0, z_start])
             linear_extrude(height = thickness, convexity = 10)
@@ -271,7 +291,7 @@ module face_ridges_3d(face = "front", thickness = 0.2) {
 module raised_text_3d(txt, x, y, size) {
     // Text is placed on the front face only. If there is a front ridge under it,
     // the union will merge it naturally.
-    translate([x, y, plate_thickness])
+    translate([x, y, bar_thickness])
         linear_extrude(height = label_raise)
             text(txt, size = size, halign = "center", valign = "center", font = font_name);
 }
@@ -292,8 +312,10 @@ module face_details_3d() {
 
 module gel_comb() {
     union() {
-        linear_extrude(height = plate_thickness, convexity = 10)
-            comb_face_2d();
+        linear_extrude(height = bar_thickness, convexity = 10)
+            bar_face_2d();
+        linear_extrude(height = tooth_thickness, convexity = 10)
+            teeth_outline_2d();
         face_details_3d();
     }
 }
