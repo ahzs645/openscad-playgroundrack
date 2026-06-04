@@ -1,0 +1,131 @@
+[    1593ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-2CEPAKRD.js?v=d5899ea4:21608
+[    1746ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "root": {
+        "padding": "var(--spacingHorizontalM)",
+        "gap": "var(--spacingHorizontalL)"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "root" => "&root". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    1746ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "mainToolbar": {
+        "alignItems": "stretch"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "mainToolbar" => "&mainToolbar". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    1746ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "toolbarActions": {
+        "justifyContent": "flex-start",
+        "> *": {
+          "flex": "1 1 160px"
+        }
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "toolbarActions" => "&toolbarActions". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    1746ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "feedbackCard": {
+        "padding": "var(--spacingHorizontalM)"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "feedbackCard" => "&feedbackCard". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    1776ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3000/favicon.ico:0
+[    2093ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "surface": {
+        "width": "95vw",
+        "height": "90vh"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "surface" => "&surface". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    2093ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "lists": {
+        "gridTemplateColumns": "1fr",
+        "overflowY": "auto"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "lists" => "&lists". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[    2093ms] [ERROR] @griffel/react: A rule was not resolved to CSS properly. Please check your `makeStyles` or `makeResetStyles` calls for following:
+  makeStyles({
+    [slot]: {
+      "listColumn": {
+        "minHeight": "220px",
+        "maxHeight": "none"
+      }
+    }
+  })
+
+It looks that you're are using a nested selector, but it is missing an ampersand placeholder where the generated class name should be injected.
+Try to update a property to include it i.e "listColumn" => "&listColumn". @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-JSRXLUWO.js?v=d5899ea4:2392
+[  172197ms] [LOG] [vite] server connection lost. Polling for restart... @ http://127.0.0.1:3000/@vite/client:963
+[  172198ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  173200ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  174203ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  175205ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  176207ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  177208ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  178210ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  179213ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  180216ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  181219ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  182226ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  183229ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  184235ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  185241ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  186262ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  187285ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  188314ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  189355ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  190382ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  191462ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  192617ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  193698ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  194897ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  195987ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  197324ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  198844ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  200808ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  202093ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  203952ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  206314ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  211522ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  214277ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  216522ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  222503ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  226349ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  231744ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  233767ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  238300ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  242444ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  246144ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  249294ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  252568ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  257469ms] [ERROR] WebSocket connection to 'ws://127.0.0.1:3000/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://127.0.0.1:3000/@vite/client:1034
+[  261059ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://127.0.0.1:3000/node_modules/.vite/deps/chunk-2CEPAKRD.js?v=d5899ea4:21608

@@ -1,0 +1,26 @@
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - checkbox [checked] [ref=e9] [cursor=pointer]
+      - generic [ref=e10] [cursor=pointer]:
+        - generic: 
+        - generic [ref=e11]: View
+    - button "Gallery" [ref=e13] [cursor=pointer]:
+      - generic: 
+      - generic [ref=e14]: Gallery
+  - generic [ref=e15]:
+    - generic [ref=e16]: Loading viewer...
+    - generic [ref=e17]: Loading customizer...
+  - progressbar [ref=e18]
+  - generic [ref=e19]:
+    - button "Previewing..." [disabled]:
+      - generic: 
+      - generic: Previewing...
+    - generic [ref=e20]:
+      - button "Share" [disabled]:
+        - generic: 
+        - generic: Share
+    - button "" [ref=e21] [cursor=pointer]:
+      - generic: 
+    - button "" [ref=e22] [cursor=pointer]:
+      - generic: 

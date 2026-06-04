@@ -1,0 +1,41 @@
+[    1812ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/index.js:69859
+[    1837ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:4000/index.js:58397
+[    2090ms] [LOG] Checking for main.json, activePath: /playground.scad @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:48
+[    2090ms] [LOG] Looking for main.json at: /main.json @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:57
+[    2090ms] [LOG] main.json not found @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:114
+[    2090ms] [LOG] Checking for main.json, activePath: /playground.scad @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:48
+[    2090ms] [LOG] Looking for main.json at: /main.json @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:57
+[    2090ms] [LOG] main.json not found @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:114
+[    2262ms] [LOG] Checking for main.json, activePath: /libraries/Models/Parametric Gel Comb/main.scad @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:48
+[    2262ms] [LOG] Looking for main.json at: /libraries/Models/Parametric Gel Comb/main.json @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:57
+[    2262ms] [LOG] Fetching main.json via HTTP: /Models/Parametric Gel Comb/Main.json @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:63
+[    2263ms] [WARNING] Failure to reconstruct an HDR image from http://localhost:4000/skybox-lights.jpg: Gain map metadata not found in the file, HDRJPGLoader will render the SDR jpeg @ http://localhost:4000/model-viewer.min.js:755
+[    3617ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4000/Models/Parametric%20Gel%20Comb/Main.json:0
+[    3624ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4000/Models/Parametric%20Gel%20Comb/main.json:0
+[    3624ms] [LOG] main.json not found via HTTP @ http://localhost:4000/src_components_CustomizerPanel_tsx.index.js:77
+[    3654ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/openscad-worker.js:1990
+[    3671ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/openscad-worker.js:1990
+[    4883ms] [LOG] Writing /libraries/Models/Parametric Gel Comb/main.scad @ http://localhost:4000/openscad-worker.js:4245
+[    4888ms] [LOG] Invoking OpenSCAD with:  [/libraries/Models/Parametric Gel Comb/main.scad, -o, out.json, --export-format=param] @ http://localhost:4000/openscad-worker.js:4277
+[    5892ms] [LOG] Writing /libraries/Models/Parametric Gel Comb/main.scad @ http://localhost:4000/openscad-worker.js:4245
+[    5897ms] [LOG] Invoking OpenSCAD with:  [/libraries/Models/Parametric Gel Comb/main.scad, -o, main.off, --backend=manifold, --export-format=off, --enable=lazy-union] @ http://localhost:4000/openscad-worker.js:4277
+[    6285ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/openscad-worker.js:1990
+[    7413ms] [LOG] Writing /libraries/Models/Parametric Gel Comb/main.scad @ http://localhost:4000/openscad-worker.js:4245
+[    7419ms] [LOG] Invoking OpenSCAD with:  [/libraries/Models/Parametric Gel Comb/main.scad, -o, main.off, --backend=manifold, --export-format=off, -D$fn=48, -Dtooth_count=38, -Dtooth_length=20, -Dtooth_width=3, -Dtooth_thickness=0.7, -Dtooth_gap=1.5, -Dtooth_corner_radius=0.35, -Dbar_thickness=1, -Dside_overhang=3.7, -Dbar_height=18, -Dbody_corner_radius=0.6, -Dslot_count=2, -Dslot_height=3, -Dslot_width_manual=0, -Dslot_gap=4, -Dslot_side_margin=6, -Dslot_center_y=9.8, -Dhook_width=2.2, -Dhook_drop=6, -Dhook_attach_height=1.2, -Dhook_radius=0.4, -Dhook_angle_degrees=8, -Dhook_tip_outward_extra=0, -Dfront_ridge_thickness=0.2, -Dback_ridge_thickness=0.2, -Dtop_ridge_height=1, -Dbottom_ridge_height=1, -Dbottom_ridge_gap_from_teeth=1, -Dridge_x_overhang=0, -Dlabel_raise=0.25, -Dlabel_size=4, -Dlabel_y=14.1, --enable=lazy-union] @ http://localhost:4000/openscad-worker.js:4277
+[    8187ms] [LOG] onLoad CustomEvent @ http://localhost:4000/src_components_ViewerPanel_tsx.index.js:89
+[    8253ms] [LOG] {blurhash: |GS?AJ%M-?t6ogt7Rixuae%MRhj[xwWAaxayWAj].AaxISj]oz…AayxwWBRhaxj[%MWBj[axWBtSaeRij]ogkCayWBWAayt8j]WA} @ http://localhost:4000/src_components_ViewerPanel_tsx.index.js:95
+[  106458ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/openscad-worker.js:1990
+[  106730ms] [LOG] Writing /libraries/Models/Parametric Gel Comb/main.scad @ http://localhost:4000/openscad-worker.js:4245
+[  106732ms] [LOG] Invoking OpenSCAD with:  [/libraries/Models/Parametric Gel Comb/main.scad, -o, main.off, --backend=manifold, --export-format=off, -D$fn=48, -Dtooth_count=38, -Dtooth_length=20, -Dtooth_width=3, -Dtooth_thickness=0.7, -Dtooth_gap=1.5, -Dtooth_corner_radius=0.35, -Dbar_thickness=1, -Dside_overhang=3.7, -Dbar_height=18, -Dbody_corner_radius=0.6, -Dslot_count=2, -Dslot_height=3, -Dslot_width_manual=0, -Dslot_gap=4, -Dslot_side_margin=6, -Dslot_center_y=9.8, -Dhook_width=2.2, -Dhook_drop=6, -Dhook_attach_height=1.2, -Dhook_radius=0.4, -Dhook_angle_degrees=8, -Dhook_tip_outward_extra=0, -Dfront_ridge_thickness=0.2, -Dback_ridge_thickness=0.2, -Dtop_ridge_height=1, -Dbottom_ridge_height=1, -Dbottom_ridge_gap_from_teeth=1, -Dridge_x_overhang=0, -Dlabel_raise=0.25, -Dlabel_size=4, -Dlabel_y=14.1, --enable=lazy-union] @ http://localhost:4000/openscad-worker.js:4277
+[  114782ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement disabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ http://localhost:4000/openscad-worker.js:1990
+[  115006ms] [LOG] Writing /export.scad @ http://localhost:4000/openscad-worker.js:4245
+[  115006ms] [LOG] Writing main.off @ http://localhost:4000/openscad-worker.js:4245
+[  115007ms] [LOG] Invoking OpenSCAD with:  [/export.scad, -o, export.stl, --backend=manifold, --export-format=binstl, --enable=lazy-union] @ http://localhost:4000/openscad-worker.js:4277
+[  115137ms] [LOG] Export {"stderr":"Geometries in cache: 1"} @ http://localhost:4000/index.js:68420
+[  115138ms] [LOG] Export {"stderr":"Geometry cache size in bytes: 359592"} @ http://localhost:4000/index.js:68420
+[  115138ms] [LOG] Export {"stderr":"CGAL Polyhedrons in cache: 0"} @ http://localhost:4000/index.js:68420
+[  115138ms] [LOG] Export {"stderr":"CGAL cache size in bytes: 0"} @ http://localhost:4000/index.js:68420
+[  115138ms] [LOG] Export {"stderr":"Total rendering time: 0:00:00.112"} @ http://localhost:4000/index.js:68420
+[  115139ms] [LOG] Export {"stderr":"Top level object is a 3D object (PolySet):"} @ http://localhost:4000/index.js:68420
+[  115148ms] [LOG] Export {"stderr":"   Convex:       no"} @ http://localhost:4000/index.js:68420
+[  115148ms] [LOG] Export {"stderr":"   Facets:      7492"} @ http://localhost:4000/index.js:68420

@@ -15,14 +15,14 @@ $fn = 48;
 // ---------- Teeth ----------
 tooth_count         = 38;
 tooth_length        = 20.0;
-tooth_width         = 4.0;
+tooth_width         = 3.0;
 tooth_thickness     = 0.7;
-tooth_gap           = 2.2;
+tooth_gap           = 1.5;
 tooth_corner_radius = 0.35;
 
 // ---------- Main body ----------
 bar_thickness       = 1.0;    // Main bar sheet thickness, not counting raised ridge thickness
-side_overhang       = 5.0;    // Extra body width beyond first/last tooth
+side_overhang       = 3.7;    // Extra body width beyond first/last tooth
 bar_height          = 18.0;   // Height above the teeth
 body_corner_radius  = 0.6;
 
