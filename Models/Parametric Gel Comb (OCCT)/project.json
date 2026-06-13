@@ -1,0 +1,10 @@
+{
+  "title": "Parametric Gel Comb (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the Parametric Gel Comb: same parameters, built as exact BREP solids via occt-wasm for lossless STEP export",
+  "category": "Lab Equipment",
+  "tags": ["gel-comb", "lab", "parametric", "customizable", "occt", "opencascade"],
+  "created": "2026-06-13",
+  "author": "OpenSCAD Playground"
+}

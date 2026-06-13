@@ -16,6 +16,8 @@ const MODELS_DIR = path.resolve(__dirname, '..', 'Models');
 
 const STATIC_ENTRY_EXTS = ['.glb', '.gltf', '.stl', '.obj', '.usdz', '.3mf'];
 const SCAD_ENTRY_EXTS = ['.scad'];
+// OCCT JavaScript models (built with the OpenCASCADE engine, occt-wasm).
+const OCCT_ENTRY_EXTS = ['.occt.js', '.js'];
 const THUMBNAIL_CANDIDATES = ['thumbnail.png', 'thumbnail.jpg', 'thumbnail.jpeg', 'thumbnail.webp', 'thumbnail.svg'];
 
 function readJSON(filePath) {
@@ -38,8 +40,7 @@ function findEntry(dir, exts) {
   }
   for (const name of entries) {
     if (name.startsWith('.')) continue;
-    const ext = path.extname(name).toLowerCase();
-    if (exts.includes(ext)) {
+    if (exts.some((ext) => name.toLowerCase().endsWith(ext))) {
       const full = path.join(dir, name);
       if (fs.statSync(full).isFile()) return name;
     }
@@ -68,6 +69,7 @@ function scanProject(name, { fix }) {
   const projectJson = readJSON(projectJsonPath) ?? {};
 
   const declaredType = projectJson.type === 'static' ? 'static' : (projectJson.type === 'scad' ? 'scad' : null);
+  const declaredEngine = projectJson.engine === 'occt' ? 'occt' : (projectJson.engine === 'openscad' ? 'openscad' : null);
 
   // Figure out entry file
   let entry = typeof projectJson.entry === 'string' ? projectJson.entry : null;
@@ -78,12 +80,14 @@ function scanProject(name, { fix }) {
     // Try to auto-detect a sensible entry
     if (type === 'static') {
       entry = findEntry(dir, STATIC_ENTRY_EXTS);
-    } else if (type === 'scad') {
-      entry = findEntry(dir, SCAD_ENTRY_EXTS);
+    } else if (type === 'scad' || declaredEngine) {
+      entry = findEntry(dir, declaredEngine === 'occt' ? OCCT_ENTRY_EXTS : SCAD_ENTRY_EXTS);
+      type = 'scad';
     } else {
       const scad = findEntry(dir, SCAD_ENTRY_EXTS);
-      if (scad) {
-        entry = scad;
+      const occt = scad ? null : findEntry(dir, OCCT_ENTRY_EXTS);
+      if (scad || occt) {
+        entry = scad ?? occt;
         type = 'scad';
       } else {
         const staticFile = findEntry(dir, STATIC_ENTRY_EXTS);
@@ -94,8 +98,8 @@ function scanProject(name, { fix }) {
       }
     }
   } else if (!type) {
-    const ext = path.extname(entry).toLowerCase();
-    type = SCAD_ENTRY_EXTS.includes(ext) ? 'scad' : 'static';
+    const lower = entry.toLowerCase();
+    type = (lower.endsWith('.scad') || lower.endsWith('.js')) ? 'scad' : 'static';
   }
 
   if (!entry) {
@@ -116,6 +120,10 @@ function scanProject(name, { fix }) {
 
   const thumbnail = findThumbnail(dir, projectJson.image || projectJson.thumbnail);
 
+  const engine = type === 'static'
+    ? undefined
+    : (declaredEngine ?? (entry.toLowerCase().endsWith('.js') ? 'occt' : 'openscad'));
+
   return {
     id: name,
     title: projectJson.title || humanize(name),
@@ -125,6 +133,7 @@ function scanProject(name, { fix }) {
     author: projectJson.author,
     entry,
     type,
+    engine,
     image: thumbnail || undefined,
     status: projectJson.status,
     hidden: projectJson.hidden === true,

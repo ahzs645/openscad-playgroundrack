@@ -224,7 +224,7 @@ export function App({initialState, statePersister, fs}: {initialState: State, st
 
         // Fallback: Try common file names
         if (!opened) {
-          const tryFiles = ['main.scad', 'Main.scad', `${modelParam}.scad`];
+          const tryFiles = ['main.scad', 'Main.scad', `${modelParam}.scad`, 'main.occt.js'];
           for (const file of tryFiles) {
             try {
               const response = await fetch(`${httpModelPath}/${encodeURIComponent(file)}`);
