@@ -25,18 +25,9 @@ jobs:
         with:
           node-version: ${{ matrix.node.version }}
           cache: 'npm'
-      - name: Cache Puppeteer Chrome
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            puppeteer-${{ runner.os }}-
       - run: npm ci
       - name: Verify Models index is up to date
         run: node scripts/generate-models-index.mjs --check
-      - name: Install Puppeteer's Chrome
-        run: npx puppeteer browsers install chrome
       - run: npm run build:all
       - name: Archive production artifacts
         uses: actions/upload-artifact@v7
@@ -44,5 +35,3 @@ jobs:
           name: dist-node-${{ matrix.node.name }}
           path: dist
           retention-days: 30
-      - run: NODE_ENV=development npm run test:e2e
-      - run: NODE_ENV=production  npm run test:e2e

@@ -67,7 +67,7 @@ export function spawnOcctJob(args: OcctJobArgs): AbortablePromise<OcctWorkerResu
       id,
       ...args,
       occtVersion,
-      occtBaseUrl: new URL(`./occt/${occtVersion}/`, import.meta.url).href,
+      occtBaseUrl: new URL(`occt/${occtVersion}/`, document.baseURI).href,
     };
     try {
       getWorker().postMessage(request);

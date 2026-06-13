@@ -1,0 +1,34 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * *'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-24.04
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
+          cache: 'npm'
+      - name: Cache Puppeteer Chrome
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            puppeteer-${{ runner.os }}-
+      - run: npm ci
+      - name: Install Puppeteer's Chrome
+        run: npx puppeteer browsers install chrome
+      - run: npm run build:all
+      - name: Run development e2e
+        run: NODE_ENV=development npm run test:e2e
+      - name: Run production e2e
+        run: NODE_ENV=production npm run test:e2e
