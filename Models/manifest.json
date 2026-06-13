@@ -14,6 +14,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -48,6 +49,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -65,6 +67,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -83,6 +86,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -101,6 +105,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -118,6 +123,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -135,8 +141,29 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2026-05-29"
+    },
+    {
+      "id": "Parametric Gel Comb (OCCT)",
+      "title": "Parametric Gel Comb (OCCT)",
+      "description": "OpenCASCADE variant of the Parametric Gel Comb: same parameters, built as exact BREP solids via occt-wasm for lossless STEP export",
+      "category": "Lab Equipment",
+      "tags": [
+        "gel-comb",
+        "lab",
+        "parametric",
+        "customizable",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-13"
     },
     {
       "id": "Pendant Lamp",
@@ -153,6 +180,7 @@
       "author": "OpenSCAD Playground",
       "entry": "Main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -175,6 +203,7 @@
       "author": "Reverse-engineered starter CAD",
       "entry": "prechamber_nozzle_insert_BOSL2_threads.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false
     },
     {
@@ -189,6 +218,7 @@
       ],
       "entry": "Main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false
     },
     {
@@ -205,6 +235,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
     },
@@ -221,6 +252,7 @@
       "author": "OpenSCAD Playground",
       "entry": "main.scad",
       "type": "scad",
+      "engine": "openscad",
       "hidden": true,
       "created": "2024-01-01"
     }

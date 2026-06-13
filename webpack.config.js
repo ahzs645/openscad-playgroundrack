@@ -215,6 +215,17 @@ const config = [
             to: path.resolve(__dirname, 'dist/Models'),
             toType: 'dir',
           },
+          // OpenCASCADE (occt-wasm) runtime for the OCCT rendering engine.
+          // The worker bundle dynamically imports ./occt-wasm.js at runtime
+          // (webpackIgnore), so both files must sit next to it in dist/.
+          {
+            from: path.resolve(__dirname, 'node_modules/occt-wasm/dist/occt-wasm.js'),
+            to: path.resolve(__dirname, 'dist'),
+          },
+          {
+            from: path.resolve(__dirname, 'node_modules/occt-wasm/dist/occt-wasm.wasm'),
+            to: path.resolve(__dirname, 'dist'),
+          },
         ],
       }),
     ],
@@ -282,6 +293,58 @@ const config = [
         'process.env.NODE_ENV': 'development',
       }),
     ],
+  },
+  {
+    // OCCT rendering engine worker (OpenCASCADE via occt-wasm).
+    entry: './src/runner/occt-worker.ts',
+    output: {
+      filename: 'occt-worker.js',
+      path: path.resolve(__dirname, 'dist'),
+      globalObject: 'self',
+    },
+    devtool: isDev ? 'source-map' : 'nosources-source-map',
+    mode: 'production',
+    target: 'webworker',
+    module: {
+      rules: [
+        {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
+        {
+          test: /\.tsx?$/,
+          use: {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              compilerOptions: {
+                module: 'esnext',
+                moduleResolution: 'node',
+                target: 'ES2022',
+                lib: ['WebWorker', 'ES2022'],
+                sourceMap: isDev,
+                inlineSources: isDev
+              }
+            }
+          },
+          exclude: /node_modules/,
+        },
+      ]
+    },
+    resolve: {
+      extensions: ['.tsx', '.ts', '.js', '.mjs'],
+      modules: [
+        path.resolve(__dirname, 'src'),
+        'node_modules'
+      ],
+      fallback: {
+        fs: false,
+        path: false,
+        module: false
+      }
+    },
   },
 ];
 

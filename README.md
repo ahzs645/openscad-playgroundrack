@@ -58,6 +58,18 @@ When you first run the application, you'll see a full-screen gallery landing pag
 2. Or use the Gallery button inside the app
 3. Or navigate directly via URL parameter
 
+#### Rendering Engines
+Each model renders with one of two engines, chosen per project:
+- **OpenSCAD** (default): `.scad` sources compiled to meshes by OpenSCAD WASM
+- **OpenCASCADE (OCCT)**: `.occt.js` JavaScript models built as exact BREP
+  solids via [occt-wasm](https://github.com/andymai/occt-wasm), with native
+  (lossless) STEP export
+
+Set `"engine": "occt"` in a project's `project.json` (or use a `.js` entry
+file). See [OCCT_MODELS.md](./OCCT_MODELS.md) for the authoring guide, and
+`Models/Parametric Gel Comb (OCCT)` for an OCCT port of the OpenSCAD
+Parametric Gel Comb model.
+
 #### Editor Controls
 - **F5**: Quick preview (fast render)
 - **F6** or **Ctrl+Enter**: Full render (slower but complete)

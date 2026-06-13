@@ -1,6 +1,8 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
 import { checkSyntax, render, RenderArgs, RenderOutput } from "../runner/actions.ts";
+import { renderOcct, spawnOcctJob, meshToPolyhedron } from "../runner/occt-runner.ts";
+import { engineForPath } from "./engine.ts";
 import { MultiLayoutComponentId, SingleLayoutComponentId, State, StatePersister } from "./app-state.ts";
 import { VALID_EXPORT_FORMATS_2D, VALID_EXPORT_FORMATS_3D } from './formats.ts';
 import { bubbleUpDeepMutations } from "./deep-mutate.ts";
@@ -460,6 +462,10 @@ export class Model {
       console.warn('Export is not available for static projects.');
       return;
     }
+    if (engineForPath(this.state.params.activePath) === 'occt') {
+      await this.exportOcct();
+      return;
+    }
     if (this.state.output) {
       const normalPassThrough = 
         (this.state.is2D && this.state.params.exportFormat2D === 'svg')
@@ -618,6 +624,10 @@ export class Model {
       console.warn('Render skipped for static project.');
       return;
     }
+    if (engineForPath(this.state.params.activePath) === 'occt') {
+      await this.renderWithOcct({isPreview, now});
+      return;
+    }
     // console.log(JSON.stringify(this.state, null, 2));
     mountArchives ??= true;
     retryInOtherDim ??= true;
@@ -765,6 +775,149 @@ export class Model {
         this.render({isPreview, now: true, retryInOtherDim: false});
         return;
       }
+    }
+  }
+
+  /**
+   * Render the active OCCT JavaScript model (engine: 'occt') by building it
+   * with the OpenCASCADE kernel in the OCCT worker, then converting the
+   * tessellated mesh to GLB for the viewer. Full renders also produce an STL
+   * outFile so mesh-based export paths keep working.
+   */
+  private async renderWithOcct({isPreview, now}: {isPreview: boolean, now: boolean}) {
+    const setRendering = (s: State, value: boolean) => {
+      if (isPreview) {
+        s.previewing = value;
+      } else {
+        s.rendering = value;
+      }
+    }
+    this.mutate(s => {
+      s.currentRunLogs = [];
+      setRendering(s, true);
+    });
+
+    const {activePath, vars} = this.state.params;
+    const source = this.source;
+    const stem = (activePath.split('/').pop() ?? 'model').replace(/(\.occt)?\.js$/, '');
+
+    try {
+      const result = await renderOcct({
+        source,
+        vars,
+        want: isPreview ? ['mesh'] : ['mesh', 'stl'],
+        // Preview meshes can be a bit coarser for speed.
+        linearDeflection: isPreview ? 0.2 : 0.05,
+      })({now});
+      if (!result.mesh) throw new Error('OCCT render returned no mesh.');
+
+      const { exportGlb } = await import("../io/export_glb.ts");
+      const glbBlob = await exportGlb(meshToPolyhedron(result.mesh));
+      const displayFile = new File([glbBlob], `${stem}.glb`, {type: 'model/gltf-binary'});
+      const outFile = result.stlText != null
+        ? new File([result.stlText], `${stem}.stl`, {type: 'model/stl'})
+        : displayFile;
+
+      const outFileURL = URL.createObjectURL(outFile);
+      const displayFileURL = await readFileAsDataURL(displayFile);
+      const logText = result.logs.join('\n');
+      this.mutate(s => {
+        setRendering(s, false);
+        s.error = undefined;
+        s.is2D = false;
+        s.parameterSet = {title: stem, parameters: result.parameters};
+        s.currentRunLogs = result.logs.map(line => ['stdout', line]);
+        s.lastCheckerRun = {logText, markers: []};
+        if (s.output?.outFileURL?.startsWith('blob:') ?? false) {
+          URL.revokeObjectURL(s.output!.outFileURL);
+        }
+        if (s.output?.displayFileURL?.startsWith('blob:') ?? false) {
+          URL.revokeObjectURL(s.output!.displayFileURL!);
+        }
+        s.output = {
+          isPreview,
+          outFile,
+          outFileURL,
+          displayFile,
+          displayFileURL,
+          elapsedMillis: result.elapsedMillis,
+          formattedElapsedMillis: formatMillis(result.elapsedMillis),
+          formattedOutFileSize: formatBytes(outFile.size),
+        };
+      });
+    } catch (err) {
+      this.mutate(s => {
+        setRendering(s, false);
+        console.error('Error while doing OCCT ' + (isPreview ? 'preview' : 'rendering') + ':', err)
+        s.error = `${err}`;
+      });
+    }
+  }
+
+  /**
+   * Export for OCCT models: GLB/STL come straight from the last render;
+   * STEP is generated as exact BREP by the OCCT kernel (no tessellation).
+   */
+  private async exportOcct() {
+    // Formats the OCCT engine doesn't support fall back to GLB, matching the
+    // fallback selection ExportButton displays.
+    const requested = this.state.params.exportFormat3D;
+    const format = requested === 'stl' || requested === 'step' ? requested : 'glb';
+    const output = this.state.output;
+    if (!output) throw new Error('No output to export');
+
+    if (format === 'glb' && output.displayFile?.name.endsWith('.glb') && output.displayFileURL) {
+      this.mutate(s => s.export = s.output);
+      downloadUrl(output.displayFileURL, output.displayFile.name);
+      return;
+    }
+    if (format === 'stl' && output.outFile.name.endsWith('.stl')) {
+      this.mutate(s => s.export = s.output);
+      downloadUrl(output.outFileURL, output.outFile.name);
+      return;
+    }
+    if (format !== 'step') {
+      this.mutate(s => s.error = `Export format "${format}" is not supported for OCCT models (use GLB, STL or STEP).`);
+      return;
+    }
+
+    this.mutate(s => {
+      s.currentRunLogs ??= [];
+      s.exporting = true;
+    });
+    try {
+      const start = performance.now();
+      const result = await spawnOcctJob({
+        source: this.source,
+        vars: this.state.params.vars,
+        want: ['step'],
+      });
+      if (result.stepText == null) throw new Error('OCCT worker returned no STEP output.');
+      const outFile = new File(
+        [result.stepText],
+        output.outFile.name.replace(/\.[^.]+$/, '.step'),
+        {type: 'model/step'});
+      const outFileURL = URL.createObjectURL(outFile);
+      this.mutate(s => {
+        s.exporting = false;
+        if (s.export?.outFileURL?.startsWith('blob:') ?? false) {
+          URL.revokeObjectURL(s.export!.outFileURL);
+        }
+        s.export = {
+          outFile,
+          outFileURL,
+          elapsedMillis: performance.now() - start,
+          formattedElapsedMillis: formatMillis(performance.now() - start),
+          formattedOutFileSize: formatBytes(outFile.size),
+        };
+        downloadUrl(outFileURL, outFile.name);
+      });
+    } catch (err) {
+      this.mutate(s => {
+        s.exporting = false;
+        console.error('Error while exporting OCCT model:', err)
+        s.error = `${err}`;
+      });
     }
   }
 

@@ -235,6 +235,7 @@ export default function EditorPanel({className, style}: {className?: string, sty
           <Editor
             className="openscad-editor absolute-fill"
             defaultLanguage="openscad"
+            language={state.params.activePath.endsWith('.js') ? 'javascript' : 'openscad'}
             path={state.params.activePath}
             value={model.source}
             onChange={s => model.source = s ?? ''}

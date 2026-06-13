@@ -3,6 +3,7 @@
 // is cached at module scope so reopening the gallery is instant.
 
 import { httpAssetPath } from '../utils.ts';
+import { engineForProject } from './engine.ts';
 
 export interface BrowserProject {
   id: string;
@@ -14,6 +15,8 @@ export interface BrowserProject {
   entry: string;
   entryPath: string;
   type: 'scad' | 'static';
+  /** Rendering engine for code projects: OpenSCAD (default) or OpenCASCADE. */
+  engine?: 'openscad' | 'occt';
   image?: string;
   status?: 'ideas' | 'in-progress' | 'in-review' | 'completed';
   hidden?: boolean;
@@ -49,6 +52,7 @@ async function collectFromManifest(): Promise<BrowserProject[]> {
       entry: p.entry,
       entryPath: `${MODELS_BASE_PATH}/${p.id}/${p.entry}`,
       type: p.type === 'static' ? 'static' : 'scad',
+      engine: p.type === 'static' ? undefined : engineForProject(p.engine, p.entry ?? ''),
       image: p.image
         ? `${MODELS_HTTP_BASE}/${encodeURIComponent(p.id)}/${encodeURIComponent(p.image)}`
         : undefined,
@@ -72,7 +76,7 @@ async function collectFromManifest(): Promise<BrowserProject[]> {
     const projectType: 'scad' | 'static' = projectJson.type === 'static' ? 'static' : 'scad';
     const entry = typeof projectJson.entry === 'string' && projectJson.entry.length > 0
       ? projectJson.entry
-      : (projectType === 'scad' ? 'main.scad' : null);
+      : (projectType === 'scad' ? (projectJson.engine === 'occt' ? 'main.occt.js' : 'main.scad') : null);
     if (!entry) return null;
 
     const specifiedImage = projectJson.image || projectJson.thumbnail;
@@ -90,6 +94,7 @@ async function collectFromManifest(): Promise<BrowserProject[]> {
       entry,
       entryPath: `${MODELS_BASE_PATH}/${projectName}/${entry}`,
       type: projectType,
+      engine: projectType === 'static' ? undefined : engineForProject(projectJson.engine, entry),
       image: imageUrl,
       status: projectJson.status,
       hidden: projectJson.hidden === true,

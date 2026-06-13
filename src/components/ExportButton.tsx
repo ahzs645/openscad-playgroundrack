@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { ModelContext } from './contexts.ts';
+import { engineForPath } from '../state/engine.ts';
 
 import { SplitButton } from 'primereact/splitbutton';
 import { MenuItem } from 'primereact/menuitem';
@@ -10,9 +11,32 @@ export default function ExportButton({className, style}: {className?: string, st
     const model = useContext(ModelContext);
     if (!model) throw new Error('No model');
     const state = model.state;
+    const isOcctModel = engineForPath(state.params.activePath) === 'occt';
 
-    const dropdownModel: ExtendedMenuItem[] = 
-      state.is2D ? [
+    const dropdownModel: ExtendedMenuItem[] =
+      isOcctModel ? [
+        {
+          data: 'glb',
+          buttonLabel: 'Download GLB',
+          label: 'GLB (binary glTF)',
+          icon: 'pi pi-file',
+          command: () => model!.setFormats(undefined, 'glb'),
+        },
+        {
+          data: 'stl',
+          buttonLabel: 'Download STL',
+          label: 'STL (ascii)',
+          icon: 'pi pi-file',
+          command: () => model!.setFormats(undefined, 'stl'),
+        },
+        {
+          data: 'step',
+          buttonLabel: 'Download STEP',
+          label: 'STEP (exact BREP via OCCT)',
+          icon: 'pi pi-file-export',
+          command: () => model!.setFormats(undefined, 'step'),
+        },
+      ] : state.is2D ? [
         {
           data: 'svg',
           buttonLabel: 'SVG',
