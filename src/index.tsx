@@ -1,7 +1,7 @@
 // Portions of this file are Copyright 2021 Google LLC, and licensed under GPL2+. See COPYING.
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import PrimeReact from 'primereact/api';
 import {App} from './components/App.tsx';
 import { createEditorFS } from './fs/filesystem.ts';
@@ -175,7 +175,7 @@ async function bootstrap() {
 
   const initialState = createInitialState(editorEnabled ? persistedState : null);
 
-  const root = ReactDOM.createRoot(
+  const root = createRoot(
     document.getElementById('root') as HTMLElement
   );
   root.render(

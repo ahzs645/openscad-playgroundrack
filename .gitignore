@@ -3,6 +3,7 @@ libs
 dist
 tmp
 public/libraries
+public/occt
 public/openscad.js
 public/openscad.wasm
 src/wasm

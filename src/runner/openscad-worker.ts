@@ -7,15 +7,45 @@ import { createEditorFS, symlinkLibraries } from "../fs/filesystem.ts";
 import { OpenSCADInvocation, OpenSCADInvocationCallback, OpenSCADInvocationResults } from "./openscad-runner.ts";
 import { fetchSource } from "../utils.ts";
 
-importScripts("browserfs.min.js");
-
 declare const self: DedicatedWorkerGlobalScope;
 
 export type MergedOutputs = {stdout?: string, stderr?: string, error?: string}[];
 
 let mountedArchivesPromise: Promise<string[]> | null = null;
+let browserFSPromise: Promise<void> | null = null;
+
+async function ensureBrowserFSLoaded() {
+  if ((globalThis as any).BrowserFS) {
+    return;
+  }
+  browserFSPromise ??= (async () => {
+    const candidates = [
+      new URL('./browserfs.min.js', self.location.href).href,
+      new URL('/browserfs.min.js', self.location.origin).href,
+    ];
+    let lastError: unknown;
+    for (const url of candidates) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const code = await response.text();
+        (0, eval)(code.replace('(this,function()', '(globalThis,function()'));
+        if ((globalThis as any).BrowserFS) {
+          return;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw new Error(`Failed to load BrowserFS: ${lastError}`);
+  })();
+  await browserFSPromise;
+}
 
 async function ensureBrowserFSLibrariesMounted(): Promise<string[]> {
+  await ensureBrowserFSLoaded();
   if (!mountedArchivesPromise) {
     mountedArchivesPromise = (async () => {
       const { mountedArchives } = await createEditorFS({prefix: '', allowPersistence: false});
@@ -41,6 +71,7 @@ self.addEventListener('message', async (e: MessageEvent<OpenSCADInvocation>) => 
   let instance: any;
   const start = performance.now();
   try {
+    await ensureBrowserFSLoaded();
     instance = await OpenSCAD({
       noInitialRun: true,
       'print': (text: string) => {

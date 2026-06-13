@@ -2,6 +2,7 @@
 
 import defaultScad from './default-scad.ts';
 import { State } from './app-state.ts';
+import { loadStoredOcctWasmVersion } from '../runner/occt-versions.ts';
 
 export const defaultSourcePath = '/playground.scad';
 export const defaultModelColor = '#f9d72c';
@@ -39,6 +40,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
         exportFormat2D: 'svg',
         exportFormat3D: 'stl',
         occtStepExportArch: '32',
+        occtWasmVersion: loadStoredOcctWasmVersion(),
       },
       view: {
         layout: {
@@ -74,6 +76,7 @@ export function createInitialState(state: State | null, source?: {content?: stri
 
   initialState.view.showAxes ??= true;
   initialState.params.occtStepExportArch ??= '32';
+  initialState.params.occtWasmVersion ??= loadStoredOcctWasmVersion();
 
   // fs.writeFile(initialState.params.sourcePath, initialState.params.source);
   // if (initialState.params.sourcePath !== defaultSourcePath) {

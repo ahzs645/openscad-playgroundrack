@@ -12,6 +12,7 @@ import JSZip from 'jszip';
 import { ProcessStreams } from "../runner/openscad-runner.ts";
 import { is2DFormatExtension } from "./formats.ts";
 import { parseOff } from "../io/import_off.ts";
+import { storeOcctWasmVersion } from "../runner/occt-versions.ts";
 // gltf-transform + chroma-js are loaded on first use to keep the initial bundle small.
 
 const githubRx = /^https:\/\/github.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/;
@@ -104,6 +105,15 @@ export class Model {
     this.mutate(s => {
       s.params.occtStepExportArch = arch;
     });
+  }
+  setOcctWasmVersion(version: NonNullable<State['params']['occtWasmVersion']>) {
+    this.mutate(s => {
+      s.params.occtWasmVersion = version;
+    });
+    storeOcctWasmVersion(version);
+    if (this.state.project?.type !== 'static' && engineForPath(this.state.params.activePath) === 'occt') {
+      this.render({isPreview: true, now: true});
+    }
   }
   setVar(name: string, value: any) {
     if (this.state.project?.type === 'static') {
@@ -804,6 +814,7 @@ export class Model {
     try {
       const result = await renderOcct({
         source,
+        occtVersion: this.state.params.occtWasmVersion,
         vars,
         want: isPreview ? ['mesh'] : ['mesh', 'stl'],
         // Preview meshes can be a bit coarser for speed.
@@ -889,6 +900,7 @@ export class Model {
       const start = performance.now();
       const result = await spawnOcctJob({
         source: this.source,
+        occtVersion: this.state.params.occtWasmVersion,
         vars: this.state.params.vars,
         want: ['step'],
       });

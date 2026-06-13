@@ -8,6 +8,7 @@
 import { AbortablePromise, turnIntoDelayableExecution } from '../utils.ts';
 import { IndexedPolyhedron, DEFAULT_FACE_COLOR } from '../io/common.ts';
 import { OcctMeshData, OcctWant, OcctWorkerRequest, OcctWorkerResponse, OcctWorkerResult } from './occt-runner-types.ts';
+import { defaultOcctWasmVersion, normalizeOcctWasmVersion, OcctWasmVersion } from './occt-versions.ts';
 
 let worker: Worker | null = null;
 let nextId = 0;
@@ -15,7 +16,7 @@ const pending = new Map<number, { resolve: (r: OcctWorkerResult) => void, reject
 
 function getWorker(): Worker {
   if (!worker) {
-    worker = new Worker('./occt-worker.js');
+    worker = new Worker(new URL('./occt-worker.ts', import.meta.url), { type: 'module' });
     worker.onmessage = (e: MessageEvent<OcctWorkerResponse>) => {
       const { id, result, error } = e.data;
       const handlers = pending.get(id);
@@ -50,6 +51,7 @@ function killWorker() {
 
 export type OcctJobArgs = {
   source: string,
+  occtVersion?: OcctWasmVersion,
   vars?: { [name: string]: any },
   want: OcctWant[],
   linearDeflection?: number,
@@ -60,7 +62,13 @@ export function spawnOcctJob(args: OcctJobArgs): AbortablePromise<OcctWorkerResu
   const id = nextId++;
   return AbortablePromise<OcctWorkerResult>((resolve, reject) => {
     pending.set(id, { resolve, reject });
-    const request: OcctWorkerRequest = { id, ...args };
+    const occtVersion = normalizeOcctWasmVersion(args.occtVersion ?? defaultOcctWasmVersion);
+    const request: OcctWorkerRequest = {
+      id,
+      ...args,
+      occtVersion,
+      occtBaseUrl: new URL(`./occt/${occtVersion}/`, import.meta.url).href,
+    };
     try {
       getWorker().postMessage(request);
     } catch (e) {

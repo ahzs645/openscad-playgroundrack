@@ -33,6 +33,7 @@ export interface State {
     exportFormat2D: keyof typeof VALID_EXPORT_FORMATS_2D,
     exportFormat3D: keyof typeof VALID_EXPORT_FORMATS_3D,
     occtStepExportArch?: '32' | '64-mt',
+    occtWasmVersion?: import('../runner/occt-versions.ts').OcctWasmVersion,
     extruderColors?: string[],
   },
 

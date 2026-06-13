@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenSCAD Playground</title>
+    <meta name="description" content="OpenSCAD Playground: edit .scad models and render them to STL from the browser (WebAssembly build OpenSCAD, with Monaco editor and STL Viewer)">
+
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="logo192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="prefetch" href="openscad.wasm">
+    <link rel="prefetch" href="openscad-worker.js">
+
+    <link rel="preload" href="Models/manifest.json" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="libraries/openscad.zip" as="fetch" crossorigin="anonymous">
+
+    <script type="module" src="/model-viewer.min.js" defer></script>
+    <script src="/browserfs.min.js" defer></script>
+    <script type="module" src="/src/index.tsx"></script>
+
+    <style>
+      #root,
+      body,
+      html {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin: 0;
+
+        height: 100vh;
+        height: 100dvh;
+        height: var(--app-height);
+      }
+
+      button,
+      .p-button,
+      .p-tabmenuitem {
+        touch-action: manipulation;
+      }
+
+      .p-tabmenu-nav {
+        justify-content: center;
+      }
+
+      .p-fieldset .p-fieldset-content {
+        padding: 0 !important;
+      }
+      .p-fieldset-legend {
+        background-color: rgba(255,255,255,0.4) !important;
+      }
+
+      .p-fieldset-legend,
+      .p-fieldset-content {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .absolute-fill {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+      }
+
+      .monaco-editor,
+      .openscad-editor {
+        background-color: rgba(255,255,255,0.5) !important;
+      }
+      textarea.openscad-editor {
+        font-family: "Droid Sans Mono", "monospace", monospace;
+        font-weight: normal;
+        font-size: 16px;
+        font-feature-settings: "liga" 0, "calt" 0;
+        line-height: 22px;
+        letter-spacing: 0px;
+      }
+      .overflow-guard,
+      .monaco-scrollable-element,
+      .monaco-editor-background {
+        background-color: transparent !important;
+      }
+
+      .opacity-animated {
+        transition: opacity 0.5s ease-in-out;
+      }
+      .opacity-0 {
+        opacity: 0;
+      }
+
+      .p-tabmenu-nav {
+        padding-right: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <audio id="complete-sound">
+      <source src="complete.wav" type="audio/wav">
+      Your browser does not support the audio element.
+    </audio>
+    <noscript>You need to enable JavaScript to run the OpenSCAD Playground.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

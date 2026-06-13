@@ -1,10 +1,13 @@
 import { Parameter } from '../state/customizer-types.ts';
+import { OcctWasmVersion } from './occt-versions.ts';
 
 export type OcctWant = 'mesh' | 'stl' | 'step';
 
 export type OcctWorkerRequest = {
   id: number,
   source: string,
+  occtVersion: OcctWasmVersion,
+  occtBaseUrl: string,
   vars?: { [name: string]: any },
   want: OcctWant[],
   linearDeflection?: number,

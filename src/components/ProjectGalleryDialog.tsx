@@ -2,6 +2,14 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { ModelContext } from './contexts.ts';
 import { loadProjects, type BrowserProject } from '../state/projects-loader.ts';
+import {
+  defaultOcctWasmVersion,
+  loadStoredOcctWasmVersion,
+  normalizeOcctWasmVersion,
+  occtWasmVersions,
+  OcctWasmVersion,
+  storeOcctWasmVersion,
+} from '../runner/occt-versions.ts';
 import './ProjectGalleryDialog.css';
 
 type ViewMode = 'grid' | 'kanban';
@@ -65,6 +73,7 @@ export function ProjectGalleryDialog({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [localOcctVersion, setLocalOcctVersion] = useState<OcctWasmVersion>(() => loadStoredOcctWasmVersion());
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined' && window.matchMedia) {
@@ -82,6 +91,24 @@ export function ProjectGalleryDialog({
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  useEffect(() => {
+    if (model) {
+      setLocalOcctVersion(normalizeOcctWasmVersion(model.state.params.occtWasmVersion ?? defaultOcctWasmVersion));
+    }
+  }, [model, model?.state.params.occtWasmVersion]);
+
+  const selectedOcctVersion = model
+    ? normalizeOcctWasmVersion(model.state.params.occtWasmVersion ?? defaultOcctWasmVersion)
+    : localOcctVersion;
+  const changeOcctVersion = (value: OcctWasmVersion) => {
+    setLocalOcctVersion(value);
+    if (model) {
+      model.setOcctWasmVersion(value);
+    } else {
+      storeOcctWasmVersion(value);
+    }
   };
 
   useEffect(() => {
@@ -302,6 +329,26 @@ export function ProjectGalleryDialog({
             </select>
           </div>
         )}
+        <div className="gallery-field">
+          <label htmlFor="gallery-occt-version-select" className="uk-form-label gallery-field-label">
+            OCCT
+          </label>
+          <select
+            id="gallery-occt-version-select"
+            value={selectedOcctVersion}
+            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+              changeOcctVersion(normalizeOcctWasmVersion(event.target.value));
+            }}
+            className="uk-select gallery-select"
+            aria-label="Select OCCT WASM version"
+          >
+            {occtWasmVersions.map(option => (
+              <option key={option.version} value={option.version}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
         {kanbanEnabled && (
           <div className="gallery-field">
             <label htmlFor="gallery-view-toggle" className="uk-form-label gallery-field-label">

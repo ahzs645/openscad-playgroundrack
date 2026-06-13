@@ -38,7 +38,7 @@ export function spawnOpenSCAD(
   }
     
   return AbortablePromise<OpenSCADInvocationResults>((resolve: (result: OpenSCADInvocationResults) => void, reject: (error: any) => void) => {
-    worker = new Worker('./openscad-worker.js');//, { type: 'module' });
+    worker = new Worker(new URL('./openscad-worker.ts', import.meta.url), { type: 'module' });
     rejection = reject;
     worker.onmessage = (e: MessageEvent<OpenSCADInvocationCallback>) => {
       if ('result' in e.data) {

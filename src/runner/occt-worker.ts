@@ -5,23 +5,34 @@
 // initialized once and reused across renders; shapes are released after
 // every job via releaseAll().
 
-import { OcctKernel, type ShapeHandle } from 'occt-wasm';
+import type { OcctKernel, ShapeHandle } from 'occt-wasm';
 import { buildOcctModel } from './occt-model-runtime.js';
 import { OcctWorkerRequest, OcctWorkerResponse, OcctWorkerResult } from './occt-runner-types.ts';
+import { defaultOcctWasmVersion, OcctWasmVersion } from './occt-versions.ts';
 
 declare var self: DedicatedWorkerGlobalScope;
 
-let kernelPromise: Promise<OcctKernel> | undefined;
+type OcctWasmModule = typeof import('occt-wasm');
 
-function getKernel(): Promise<OcctKernel> {
-  // The .wasm sits next to this worker bundle in dist/ (copied by webpack).
-  kernelPromise ??= OcctKernel.init({ wasm: 'occt-wasm.wasm' });
+const kernelPromises = new Map<OcctWasmVersion, Promise<OcctKernel>>();
+
+async function getKernel(version: OcctWasmVersion, baseUrl: string): Promise<OcctKernel> {
+  let kernelPromise = kernelPromises.get(version);
+  if (!kernelPromise) {
+    kernelPromise = (async () => {
+      const moduleUrl = new URL('index.js', baseUrl).href;
+      const wasmUrl = new URL('occt-wasm.wasm', baseUrl).href;
+      const { OcctKernel } = await import(/* @vite-ignore */ moduleUrl) as OcctWasmModule;
+      return OcctKernel.init({ wasm: wasmUrl });
+    })();
+    kernelPromises.set(version, kernelPromise);
+  }
   return kernelPromise;
 }
 
 async function handleRequest(req: OcctWorkerRequest): Promise<OcctWorkerResult> {
   const start = performance.now();
-  const kernel = await getKernel();
+  const kernel = await getKernel(req.occtVersion ?? defaultOcctWasmVersion, req.occtBaseUrl);
   try {
     const { shape: rawShape, parameters, logs } = buildOcctModel(kernel, req.source, req.vars);
     const shape = rawShape as ShapeHandle;
