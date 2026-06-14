@@ -35,13 +35,16 @@ async function validateZipArchive(zipData: any): Promise<void> {
   });
 }
 
-export async function getBrowserFSLibrariesMounts(archiveNames: string[]): Promise<{ mounts: FSMounts, mountedArchives: string[] }> {
+export async function getBrowserFSLibrariesMounts(archiveNames: string[], librariesBaseUrl?: string): Promise<{ mounts: FSMounts, mountedArchives: string[] }> {
   const Buffer = BrowserFS.BFSRequire('buffer').Buffer;
   const mounts: FSMounts = {};
   const mountedArchives: string[] = [];
 
   await Promise.all(archiveNames.map(async (name) => {
-    const url = `./libraries/${name}.zip`;
+    // In a worker, a relative './libraries/...' resolves against the worker
+    // script URL (e.g. /src/runner/), not the app root, so callers can pass an
+    // absolute base URL to load the archives from the right place.
+    const url = librariesBaseUrl ? new URL(`${name}.zip`, librariesBaseUrl).href : `./libraries/${name}.zip`;
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -109,11 +112,11 @@ function configureAndInstallFS(windowOrSelf: Window, options: any) {
   });
 }
 
-export async function createEditorFS({prefix, allowPersistence, onlyMountCritical = false}: {prefix: string, allowPersistence: boolean, onlyMountCritical?: boolean}): Promise<{ fs: FS, mountedArchives: string[] }> {
+export async function createEditorFS({prefix, allowPersistence, onlyMountCritical = false, librariesBaseUrl}: {prefix: string, allowPersistence: boolean, onlyMountCritical?: boolean, librariesBaseUrl?: string}): Promise<{ fs: FS, mountedArchives: string[] }> {
   // Only load critical archives upfront to improve initial page load
   // On-demand archives will be loaded by OpenSCAD worker when needed
   const archiveNames = onlyMountCritical ? criticalArchives : deployedArchiveNames;
-  const { mounts: librariesMounts, mountedArchives } = await getBrowserFSLibrariesMounts(archiveNames);
+  const { mounts: librariesMounts, mountedArchives } = await getBrowserFSLibrariesMounts(archiveNames, librariesBaseUrl);
   const allMounts: FSMounts = {};
   for (const n in librariesMounts) {
     allMounts[`${prefix}${n}`] = librariesMounts[n];

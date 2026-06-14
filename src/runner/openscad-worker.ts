@@ -44,11 +44,11 @@ async function ensureBrowserFSLoaded() {
   await browserFSPromise;
 }
 
-async function ensureBrowserFSLibrariesMounted(): Promise<string[]> {
+async function ensureBrowserFSLibrariesMounted(librariesBaseUrl?: string): Promise<string[]> {
   await ensureBrowserFSLoaded();
   if (!mountedArchivesPromise) {
     mountedArchivesPromise = (async () => {
-      const { mountedArchives } = await createEditorFS({prefix: '', allowPersistence: false});
+      const { mountedArchives } = await createEditorFS({prefix: '', allowPersistence: false, librariesBaseUrl});
       return mountedArchives;
     })();
   }
@@ -62,6 +62,7 @@ function callback(payload: OpenSCADInvocationCallback) {
 self.addEventListener('message', async (e: MessageEvent<OpenSCADInvocation>) => {
   const {
     mountArchives,
+    librariesBaseUrl,
     inputs,
     args,
     outputPaths,
@@ -88,7 +89,7 @@ self.addEventListener('message', async (e: MessageEvent<OpenSCADInvocation>) => 
 
     if (mountArchives) {
       // This will mount lots of libraries' ZIP archives under /libraries/<name> -> <name>.zip
-      const mountedArchives = await ensureBrowserFSLibrariesMounted();
+      const mountedArchives = await ensureBrowserFSLibrariesMounted(librariesBaseUrl);
       
       instance.FS.mkdir('/libraries');
       
