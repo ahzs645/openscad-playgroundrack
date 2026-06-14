@@ -13,6 +13,12 @@ import {
 import './ProjectGalleryDialog.css';
 
 type ViewMode = 'grid' | 'kanban';
+type EngineFilter = 'all' | 'openscad' | 'occt';
+
+const ENGINE_LABELS: Record<'openscad' | 'occt', string> = {
+  openscad: 'OpenSCAD',
+  occt: 'OpenCascade',
+};
 
 // Defers the image network request until the card scrolls near the
 // viewport. Belt-and-braces on top of loading="lazy" — Safari < 16.4 and
@@ -73,6 +79,7 @@ export function ProjectGalleryDialog({
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [engineFilter, setEngineFilter] = useState<EngineFilter>('all');
   const [localOcctVersion, setLocalOcctVersion] = useState<OcctWasmVersion>(() => loadStoredOcctWasmVersion());
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -144,8 +151,19 @@ export function ProjectGalleryDialog({
     if (!visible) {
       setSearchTerm('');
       setSelectedCategory(null);
+      setEngineFilter('all');
     }
   }, [visible]);
+
+  const engineCounts = useMemo(() => {
+    let openscad = 0;
+    let occt = 0;
+    projects.forEach(project => {
+      if (project.engine === 'occt') occt++;
+      else if (project.engine === 'openscad') openscad++;
+    });
+    return { all: projects.length, openscad, occt };
+  }, [projects]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -160,6 +178,8 @@ export function ProjectGalleryDialog({
     return projects.filter(project => {
       const matchesCategory = !selectedCategory || project.category === selectedCategory;
       if (!matchesCategory) return false;
+      const matchesEngine = engineFilter === 'all' || project.engine === engineFilter;
+      if (!matchesEngine) return false;
       if (!term) return true;
       const haystack = [
         project.title,
@@ -170,7 +190,7 @@ export function ProjectGalleryDialog({
       ].join(' ').toLowerCase();
       return haystack.includes(term);
     });
-  }, [projects, searchTerm, selectedCategory]);
+  }, [projects, searchTerm, selectedCategory, engineFilter]);
 
   const kanbanColumns = useMemo(() => {
     const columns = {
@@ -248,9 +268,16 @@ export function ProjectGalleryDialog({
         <div className="gallery-card-body">
           <div className="gallery-card-header">
             <h3 className="gallery-card-title">{project.title}</h3>
-            {project.category && (
-              <span className="gallery-card-category">{project.category}</span>
-            )}
+            <div className="gallery-card-badges">
+              {project.engine && (
+                <span className={`gallery-engine-badge gallery-engine-badge-${project.engine}`}>
+                  {ENGINE_LABELS[project.engine]}
+                </span>
+              )}
+              {project.category && (
+                <span className="gallery-card-category">{project.category}</span>
+              )}
+            </div>
           </div>
           {project.description && (
             <p className="gallery-card-description">
@@ -327,6 +354,34 @@ export function ProjectGalleryDialog({
                 </option>
               ))}
             </select>
+          </div>
+        )}
+        {engineCounts.openscad > 0 && engineCounts.occt > 0 && (
+          <div className="gallery-field gallery-field-engine">
+            <label className="uk-form-label gallery-field-label" id="gallery-engine-label">
+              Engine
+            </label>
+            <div
+              className="uk-button-group gallery-engine-toggle"
+              role="group"
+              aria-labelledby="gallery-engine-label"
+            >
+              {([
+                ['all', `All (${engineCounts.all})`],
+                ['openscad', `${ENGINE_LABELS.openscad} (${engineCounts.openscad})`],
+                ['occt', `${ENGINE_LABELS.occt} (${engineCounts.occt})`],
+              ] as [EngineFilter, string][]).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`uk-button uk-button-small ${engineFilter === value ? 'uk-button-primary' : 'uk-button-default'}`}
+                  onClick={() => setEngineFilter(value)}
+                  aria-pressed={engineFilter === value}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         <div className="gallery-field">

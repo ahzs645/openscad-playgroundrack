@@ -10,6 +10,15 @@ import { ParameterSet } from '../state/customizer-types.ts';
 
 const syntaxDelay = 300;
 
+// Absolute base URL for the library zip archives, resolved against the document
+// base so it works both at the site root and under a subpath deployment. The
+// OpenSCAD worker needs this because a relative URL would resolve against the
+// worker script's path (e.g. /src/runner/) instead of the app root.
+function librariesBaseUrl(): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  return new URL('libraries/', document.baseURI).href;
+}
+
 type SyntaxCheckArgs = {
   activePath: string,
   sources: Source[],
@@ -27,6 +36,7 @@ export const checkSyntax =
     const outFile = 'out.json';
     const job = spawnOpenSCAD({
       mountArchives: true,
+      librariesBaseUrl: librariesBaseUrl(),
       inputs: sources,
       args: [activePath, "-o", outFile, "--export-format=param"],
       outputPaths: [outFile],
@@ -144,6 +154,7 @@ export const render =
     
     const job = spawnOpenSCAD({
       mountArchives: mountArchives,
+      librariesBaseUrl: librariesBaseUrl(),
       inputs: sources.map(s => s.path === scadPath ? {path: s.path, content} : s),
       args,
       outputPaths: [outputPath],

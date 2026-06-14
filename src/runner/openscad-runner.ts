@@ -6,6 +6,12 @@ import { Source } from "../state/app-state.ts";
 
 export type OpenSCADInvocation = {
   mountArchives: boolean,
+  /**
+   * Absolute base URL for the library `.zip` archives. Required in the worker,
+   * where a relative URL would resolve against the worker script's path rather
+   * than the app root.
+   */
+  librariesBaseUrl?: string,
   inputs?: Source[],
   args: string[],
   outputPaths?: string[],
