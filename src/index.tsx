@@ -26,6 +26,7 @@ import "primeicons/primeicons.css";
 import "primeflex/primeflex.min.css";
 
 const nodeEnv = (typeof process !== 'undefined' && process.env?.NODE_ENV) ? process.env.NODE_ENV : 'production';
+const currentCommit = import.meta.env.VITE_COMMIT_SHA || '';
 
 PrimeReact.hideOverlaysOnDocumentScrolling = false;
 
@@ -41,6 +42,66 @@ function initialHashNeedsFullLibraryMount() {
   }
   const path = decodeURIComponent(hash.substring('#path='.length));
   return path.startsWith('/libraries/');
+}
+
+function getVersionUrl() {
+  return new URL('version.json', window.location.href).toString();
+}
+
+function showUpdatePrompt(onRefresh: () => void) {
+  if (typeof document === 'undefined' || document.getElementById('app-update-prompt')) {
+    return;
+  }
+
+  const prompt = document.createElement('div');
+  prompt.id = 'app-update-prompt';
+  prompt.className = 'app-update-prompt';
+  prompt.setAttribute('role', 'status');
+  prompt.innerHTML = `
+    <span>New version available</span>
+    <button type="button">Refresh</button>
+  `;
+
+  const button = prompt.querySelector('button');
+  button?.addEventListener('click', onRefresh);
+  document.body.appendChild(prompt);
+}
+
+async function clearServiceWorkerCaches() {
+  if (!('caches' in window)) {
+    return;
+  }
+  const names = await caches.keys();
+  await Promise.all(names.map((name) => caches.delete(name)));
+}
+
+function startVersionChecker() {
+  if (nodeEnv !== 'production' || !currentCommit || typeof window === 'undefined') {
+    return;
+  }
+
+  const checkForUpdate = async () => {
+    try {
+      const response = await fetch(`${getVersionUrl()}?ts=${Date.now()}`, {
+        cache: 'no-store',
+      });
+      if (!response.ok) {
+        return;
+      }
+      const latest = await response.json() as { commit?: string };
+      if (latest.commit && latest.commit !== currentCommit) {
+        showUpdatePrompt(async () => {
+          await clearServiceWorkerCaches();
+          window.location.reload();
+        });
+      }
+    } catch (error) {
+      console.warn('Could not check deployed version.', error);
+    }
+  };
+
+  window.setTimeout(checkForUpdate, 5_000);
+  window.setInterval(checkForUpdate, 60_000);
 }
 
 if (nodeEnv !== 'production') {
@@ -64,6 +125,7 @@ if (nodeEnv !== 'production') {
   }
 } else {
   debug.disable();
+  startVersionChecker();
 }
 
 declare var BrowserFS: BrowserFSInterface
@@ -216,16 +278,17 @@ window.addEventListener('load', async () => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
 
             registration.onupdatefound = () => {
-                const installingWorker = registration.installing;
-                if (installingWorker) {
-                  installingWorker.onstatechange = () => {
-                      if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                          // Reload to activate the service worker and apply caching
-                          window.location.reload();
-                          return;
-                      }
-                  };
-                }
+              const installingWorker = registration.installing;
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    showUpdatePrompt(async () => {
+                      await clearServiceWorkerCaches();
+                      window.location.reload();
+                    });
+                  }
+                };
+              }
             };
         } catch (err) {
             console.log('ServiceWorker registration failed: ', err);

@@ -32,6 +32,11 @@ jobs:
         run: npm ci
       - name: Build site
         run: npm run build:all
+        env:
+          VITE_COMMIT_SHA: ${{ github.sha }}
+      - name: Write version file
+        run: |
+          echo "{\"commit\":\"${GITHUB_SHA}\",\"builtAt\":\"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}" > dist/version.json
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

@@ -40,7 +40,9 @@ export default defineConfig(({ mode }) => {
           clientsClaim: true,
           skipWaiting: true,
           runtimeCaching: [{
-            urlPattern: () => true,
+            urlPattern: ({ url }) =>
+              !url.pathname.endsWith('/version.json') &&
+              !url.pathname.endsWith('/sw.js'),
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'all',
@@ -93,23 +95,9 @@ export default defineConfig(({ mode }) => {
     },
     worker: {
       format: 'es',
-      rollupOptions: {
-        output: {
-          entryFileNames: '[name].js',
-          chunkFileNames: '[name].js',
-          assetFileNames: '[name][extname]',
-        },
-      },
     },
     build: {
       sourcemap: mode === 'production' ? 'hidden' : true,
-      rollupOptions: {
-        output: {
-          entryFileNames: '[name].js',
-          chunkFileNames: '[name].js',
-          assetFileNames: '[name][extname]',
-        },
-      },
     },
   };
 });
