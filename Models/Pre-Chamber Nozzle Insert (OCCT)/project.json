@@ -1,0 +1,10 @@
+{
+  "title": "Pre-Chamber Nozzle Insert (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the pre-chamber nozzle insert with conical nose, thread envelope, collar, hex, axial bore, and angled jet holes.",
+  "category": "Engineering",
+  "tags": ["spark-plug", "pre-chamber", "jet-ignition", "threads", "M14", "M10", "metal", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "Reverse-engineered starter CAD"
+}

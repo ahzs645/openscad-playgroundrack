@@ -1,0 +1,10 @@
+{
+  "title": "Pleated Pendant Lamp (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the pleated lamp shade using a hollow spherical shell with raised pleat rings and optional brim rings.",
+  "category": "Home & Decor",
+  "tags": ["lamp", "lighting", "pendant", "pleated", "customizable", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

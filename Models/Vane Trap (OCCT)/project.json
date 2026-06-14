@@ -1,0 +1,10 @@
+{
+  "title": "Vane Trap Device (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the vane trap with funnel shell, jar collar, keyed sockets, and crossed vanes.",
+  "category": "Mechanical",
+  "tags": ["trap", "mechanism", "vane", "mechanical", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

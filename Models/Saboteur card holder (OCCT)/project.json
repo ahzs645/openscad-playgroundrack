@@ -1,0 +1,10 @@
+{
+  "title": "Card Holder Grid (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the card holder grid with configurable slots and base.",
+  "category": "Games & Hobbies",
+  "tags": ["cards", "holder", "grid", "games", "organization", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

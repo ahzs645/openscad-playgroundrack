@@ -1,0 +1,10 @@
+{
+  "title": "Custom Tray System (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the customizable tray with rounded walls and optional dividers.",
+  "category": "Organization",
+  "tags": ["tray", "organization", "tools", "storage", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

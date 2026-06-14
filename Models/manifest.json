@@ -19,6 +19,26 @@
       "created": "2024-01-01"
     },
     {
+      "id": "3D Rack SCAD (OCCT)",
+      "title": "3D Rack System (OCCT)",
+      "description": "OpenCASCADE variant of the modular rack with perforated plates, simplified dovetail rails, vertical supports, and handle slot.",
+      "category": "Organization",
+      "tags": [
+        "rack",
+        "organization",
+        "modular",
+        "storage",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Atmospheric Sampler",
       "title": "Atmospheric Sampler",
       "description": "3D model of an atmospheric sampler device with interactive viewing and AR support",
@@ -54,6 +74,27 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Saboteur card holder (OCCT)",
+      "title": "Card Holder Grid (OCCT)",
+      "description": "OpenCASCADE variant of the card holder grid with configurable slots and base.",
+      "category": "Games & Hobbies",
+      "tags": [
+        "cards",
+        "holder",
+        "grid",
+        "games",
+        "organization",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Tray Scad",
       "title": "Custom Tray System",
       "description": "Customizable tray system for organizing tools and small items",
@@ -70,6 +111,26 @@
       "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
+    },
+    {
+      "id": "Tray Scad (OCCT)",
+      "title": "Custom Tray System (OCCT)",
+      "description": "OpenCASCADE variant of the customizable tray with rounded walls and optional dividers.",
+      "category": "Organization",
+      "tags": [
+        "tray",
+        "organization",
+        "tools",
+        "storage",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
     },
     {
       "id": "Keyguard with Raised Tabs",
@@ -91,6 +152,27 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Keyguard with Raised Tabs (OCCT)",
+      "title": "Customizable Keyguard (OCCT)",
+      "description": "OpenCASCADE variant of the keyguard focused on the printable plate, screen opening, cell grid, and raised tabs.",
+      "category": "Accessibility",
+      "tags": [
+        "keyguard",
+        "accessibility",
+        "tablet",
+        "AAC",
+        "customizable",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Periodic Table",
       "title": "Interlocking Boxes System",
       "description": "Modular interlocking box system perfect for organizing small parts and components",
@@ -110,6 +192,27 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Periodic Table (OCCT)",
+      "title": "Interlocking Boxes System (OCCT)",
+      "description": "OpenCASCADE variant of the modular interlocking storage box with walls, floor, optional card slot, and dovetail features.",
+      "category": "Organization",
+      "tags": [
+        "boxes",
+        "modular",
+        "interlocking",
+        "organization",
+        "storage",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Networking",
       "title": "Network Equipment Rack",
       "description": "Custom rack system for network equipment including POE switches and patch panels",
@@ -126,6 +229,26 @@
       "engine": "openscad",
       "hidden": false,
       "created": "2024-01-01"
+    },
+    {
+      "id": "Networking (OCCT)",
+      "title": "Network Equipment Rack (OCCT)",
+      "description": "OpenCASCADE variant of the network equipment rack with rack shell, shelves, front cutouts, rear cable openings, and side ventilation.",
+      "category": "Technology",
+      "tags": [
+        "networking",
+        "rack",
+        "equipment",
+        "organization",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
     },
     {
       "id": "Parametric Gel Comb",
@@ -185,6 +308,27 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Pendant Lamp (OCCT)",
+      "title": "Pleated Pendant Lamp (OCCT)",
+      "description": "OpenCASCADE variant of the pleated lamp shade using a hollow spherical shell with raised pleat rings and optional brim rings.",
+      "category": "Home & Decor",
+      "tags": [
+        "lamp",
+        "lighting",
+        "pendant",
+        "pleated",
+        "customizable",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Pre-Chamber Nozzle Insert",
       "title": "Pre-Chamber Nozzle Insert",
       "description": "Custom M14x1.25-to-M10x1.0 spark-plug pre-chamber / jet-ignition nozzle insert. Reverse-engineered starter CAD with BOSL2 helical threads, selectable original/corrected hex and collar dimensions, conical nozzle tip, 2.5 mm axial orifice, and angled 2.5/1.0 mm side jet holes. SCAD source included alongside the pre-rendered metal GLB.",
@@ -207,6 +351,29 @@
       "hidden": false
     },
     {
+      "id": "Pre-Chamber Nozzle Insert (OCCT)",
+      "title": "Pre-Chamber Nozzle Insert (OCCT)",
+      "description": "OpenCASCADE variant of the pre-chamber nozzle insert with conical nose, thread envelope, collar, hex, axial bore, and angled jet holes.",
+      "category": "Engineering",
+      "tags": [
+        "spark-plug",
+        "pre-chamber",
+        "jet-ignition",
+        "threads",
+        "M14",
+        "M10",
+        "metal",
+        "occt",
+        "opencascade"
+      ],
+      "author": "Reverse-engineered starter CAD",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Stamp",
       "title": "Stamp",
       "description": "SVG-driven stamp generator using uploaded artwork",
@@ -220,6 +387,24 @@
       "type": "scad",
       "engine": "openscad",
       "hidden": false
+    },
+    {
+      "id": "Stamp (OCCT)",
+      "title": "Stamp (OCCT)",
+      "description": "OpenCASCADE variant of the stamp body with rounded wrapper, knub, and a simplified raised/negative emblem block.",
+      "category": "Personalization",
+      "tags": [
+        "stamp",
+        "text",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
     },
     {
       "id": "Vane Trap",
@@ -240,6 +425,26 @@
       "created": "2024-01-01"
     },
     {
+      "id": "Vane Trap (OCCT)",
+      "title": "Vane Trap Device (OCCT)",
+      "description": "OpenCASCADE variant of the vane trap with funnel shell, jar collar, keyed sockets, and crossed vanes.",
+      "category": "Mechanical",
+      "tags": [
+        "trap",
+        "mechanism",
+        "vane",
+        "mechanical",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": false,
+      "created": "2026-06-14"
+    },
+    {
       "id": "Wham",
       "title": "Wham Project",
       "description": "Experimental design project with customizable features",
@@ -255,6 +460,25 @@
       "engine": "openscad",
       "hidden": true,
       "created": "2024-01-01"
+    },
+    {
+      "id": "Wham (OCCT)",
+      "title": "Wham Project (OCCT)",
+      "description": "OpenCASCADE variant of the hidden Wham prototype.",
+      "category": "Experimental",
+      "tags": [
+        "experimental",
+        "design",
+        "prototype",
+        "occt",
+        "opencascade"
+      ],
+      "author": "OpenSCAD Playground",
+      "entry": "main.occt.js",
+      "type": "scad",
+      "engine": "occt",
+      "hidden": true,
+      "created": "2026-06-14"
     }
   ]
 }

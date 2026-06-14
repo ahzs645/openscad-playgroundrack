@@ -1,0 +1,10 @@
+{
+  "title": "Stamp (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the stamp body with rounded wrapper, knub, and a simplified raised/negative emblem block.",
+  "category": "Personalization",
+  "tags": ["stamp", "text", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

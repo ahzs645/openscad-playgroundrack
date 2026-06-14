@@ -1,0 +1,10 @@
+{
+  "title": "Network Equipment Rack (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the network equipment rack with rack shell, shelves, front cutouts, rear cable openings, and side ventilation.",
+  "category": "Technology",
+  "tags": ["networking", "rack", "equipment", "organization", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

@@ -1,0 +1,11 @@
+{
+  "title": "Wham Project (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the hidden Wham prototype.",
+  "category": "Experimental",
+  "tags": ["experimental", "design", "prototype", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground",
+  "hidden": true
+}

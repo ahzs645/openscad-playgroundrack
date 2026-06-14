@@ -1,0 +1,10 @@
+{
+  "title": "Customizable Keyguard (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the keyguard focused on the printable plate, screen opening, cell grid, and raised tabs.",
+  "category": "Accessibility",
+  "tags": ["keyguard", "accessibility", "tablet", "AAC", "customizable", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

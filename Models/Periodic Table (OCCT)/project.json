@@ -1,0 +1,10 @@
+{
+  "title": "Interlocking Boxes System (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the modular interlocking storage box with walls, floor, optional card slot, and dovetail features.",
+  "category": "Organization",
+  "tags": ["boxes", "modular", "interlocking", "organization", "storage", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}

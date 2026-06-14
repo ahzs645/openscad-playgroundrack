@@ -1,0 +1,10 @@
+{
+  "title": "3D Rack System (OCCT)",
+  "entry": "main.occt.js",
+  "engine": "occt",
+  "description": "OpenCASCADE variant of the modular rack with perforated plates, simplified dovetail rails, vertical supports, and handle slot.",
+  "category": "Organization",
+  "tags": ["rack", "organization", "modular", "storage", "occt", "opencascade"],
+  "created": "2026-06-14",
+  "author": "OpenSCAD Playground"
+}
