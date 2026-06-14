@@ -3,7 +3,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const versions = ['3.3.1', '3.3.0', '3.2.3'];
+const versions = ['3.3.1'];
 const baseFiles = [
   'index.js',
   'occt-wasm.js',

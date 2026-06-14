@@ -384,26 +384,28 @@ export function ProjectGalleryDialog({
             </div>
           </div>
         )}
-        <div className="gallery-field">
-          <label htmlFor="gallery-occt-version-select" className="uk-form-label gallery-field-label">
-            OCCT
-          </label>
-          <select
-            id="gallery-occt-version-select"
-            value={selectedOcctVersion}
-            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-              changeOcctVersion(normalizeOcctWasmVersion(event.target.value));
-            }}
-            className="uk-select gallery-select"
-            aria-label="Select OCCT WASM version"
-          >
-            {occtWasmVersions.map(option => (
-              <option key={option.version} value={option.version}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {occtWasmVersions.length > 1 && (
+          <div className="gallery-field">
+            <label htmlFor="gallery-occt-version-select" className="uk-form-label gallery-field-label">
+              OCCT
+            </label>
+            <select
+              id="gallery-occt-version-select"
+              value={selectedOcctVersion}
+              onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+                changeOcctVersion(normalizeOcctWasmVersion(event.target.value));
+              }}
+              className="uk-select gallery-select"
+              aria-label="Select OCCT WASM version"
+            >
+              {occtWasmVersions.map(option => (
+                <option key={option.version} value={option.version}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         {kanbanEnabled && (
           <div className="gallery-field">
             <label htmlFor="gallery-view-toggle" className="uk-form-label gallery-field-label">
