@@ -12,13 +12,13 @@ const parameters = [
   { name: 'side_hole_tilt_from_horizontal', caption: 'Side hole tilt', group: 'Holes', initial: 30, min: -60, max: 60, step: 1 },
 ];
 
-function build({ kernel, sketch }, p) {
+function build({ kernel, sketch, solid }, p) {
   const inch = 25.4;
   const hexAf = p.dimension_preset === 'corrected' ? 5 / 8 * inch : 3 / 4 * inch;
   const collarD = p.dimension_preset === 'corrected' ? 0.73 * inch : 21.5;
   const hexH = Math.max(1, p.overall_len - p.nose_len - p.threaded_len - p.collar_h);
   const nose = kernel.makeCone(p.nose_tip_flat_d / 2, 7, p.nose_len);
-  const threadEnvelope = kernel.translate(kernel.makeCylinder(7, p.threaded_len), 0, 0, p.nose_len);
+  const threadEnvelope = solid.metricThread({ name: 'M14', height: p.threaded_len, includeCore: true, at: [0, 0, p.nose_len], samplesPerTurn: 16 });
   const collar = kernel.translate(kernel.makeCylinder(collarD / 2, p.collar_h), 0, 0, p.nose_len + p.threaded_len);
   const hexR = hexAf / Math.sqrt(3);
   const hexPts = Array.from({ length: 6 }, (_, i) => [hexR * Math.cos(Math.PI / 6 + i * Math.PI / 3), hexR * Math.sin(Math.PI / 6 + i * Math.PI / 3)]);

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ModelContext } from './contexts.ts';
-import { engineForPath } from '../state/engine.ts';
+import { capabilitiesForPath, ExportFormat3D } from '../state/engine.ts';
 
 import { SplitButton } from 'primereact/splitbutton';
 import { MenuItem } from 'primereact/menuitem';
@@ -11,32 +11,82 @@ export default function ExportButton({className, style}: {className?: string, st
     const model = useContext(ModelContext);
     if (!model) throw new Error('No model');
     const state = model.state;
-    const isOcctModel = engineForPath(state.params.activePath) === 'occt';
+    const capabilities = capabilitiesForPath(state.params.activePath);
 
-    const dropdownModel: ExtendedMenuItem[] =
-      isOcctModel ? [
-        {
-          data: 'glb',
-          buttonLabel: 'Download GLB',
-          label: 'GLB (binary glTF)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, 'glb'),
-        },
-        {
-          data: 'stl',
-          buttonLabel: 'Download STL',
-          label: 'STL (ascii)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, 'stl'),
-        },
-        {
+    const format3DItems: Record<ExportFormat3D, ExtendedMenuItem> = {
+      glb: {
+        data: 'glb',
+        buttonLabel: 'Download GLB',
+        label: 'GLB (binary glTF)',
+        icon: 'pi pi-file',
+        command: () => model!.setFormats(undefined, 'glb'),
+      },
+      stl: {
+        data: 'stl',
+        buttonLabel: 'Download STL',
+        label: capabilities.id === 'occt' ? 'STL (ascii)' : 'STL (binary)',
+        icon: 'pi pi-file',
+        command: () => model!.setFormats(undefined, 'stl'),
+      },
+      off: {
+        data: 'off',
+        buttonLabel: 'Download OFF',
+        label: 'OFF (Object File Format)',
+        icon: 'pi pi-file',
+        command: () => model!.setFormats(undefined, 'off'),
+      },
+      '3mf': {
+        data: '3mf',
+        buttonLabel: 'Download 3MF',
+        label: '3MF (Multimaterial)',
+        icon: 'pi pi-file',
+        command: () => model!.setFormats(undefined, '3mf'),
+      },
+      step: {
+        data: 'step',
+        buttonLabel: 'Download STEP',
+        label: 'STEP',
+        icon: 'pi pi-file-export',
+        command: () => model!.setFormats(undefined, 'step'),
+      },
+    };
+
+    const stepItems = capabilities.stepExportModes.map((mode): ExtendedMenuItem => {
+      if (mode.id === 'openscad-csg-32') {
+        return {
           data: 'step',
           buttonLabel: 'Download STEP',
-          label: 'STEP (exact BREP via OCCT)',
+          label: mode.label,
           icon: 'pi pi-file-export',
-          command: () => model!.setFormats(undefined, 'step'),
-        },
-      ] : state.is2D ? [
+          command: () => {
+            model!.setOcctStepExportArch('32');
+            model!.setFormats(undefined, 'step');
+          },
+        };
+      }
+      if (mode.id === 'openscad-csg-64-mt') {
+        return {
+          data: 'step-64-mt',
+          buttonLabel: 'Download STEP',
+          label: mode.label,
+          icon: 'pi pi-server',
+          command: () => {
+            model!.setOcctStepExportArch('64-mt');
+            model!.setFormats(undefined, 'step');
+          },
+        };
+      }
+      return {
+        data: 'step',
+        buttonLabel: 'Download STEP',
+        label: mode.label,
+        icon: 'pi pi-file-export',
+        command: () => model!.setFormats(undefined, 'step'),
+      };
+    });
+
+    const dropdownModel: ExtendedMenuItem[] =
+      state.is2D && capabilities.export2D.length > 0 ? [
         {
           data: 'svg',
           buttonLabel: 'SVG',
@@ -52,62 +102,18 @@ export default function ExportButton({className, style}: {className?: string, st
           command: () => model!.setFormats('dxf', undefined),
         },
       ] : [
-        {
-          data: 'glb',
-          buttonLabel: 'Download GLB',
-          label: 'GLB (binary glTF)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, 'glb'),
-        },
-        {
-          data: 'stl',
-          buttonLabel: 'Download STL',
-          label: 'STL (binary)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, 'stl'),
-        },
-        {
-          data: 'off',
-          buttonLabel: 'Download OFF',
-          label: 'OFF (Object File Format)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, 'off'),
-        },
-        {
-          data: '3mf',
-          buttonLabel: 'Download 3MF',
-          label: '3MF (Multimaterial)',
-          icon: 'pi pi-file',
-          command: () => model!.setFormats(undefined, '3mf'),
-        },
-        {
-          data: 'step',
-          buttonLabel: 'Download STEP',
-          label: 'STEP via OCCT (32-bit)',
-          icon: 'pi pi-file-export',
-          command: () => {
-            model!.setOcctStepExportArch('32');
-            model!.setFormats(undefined, 'step');
+        ...capabilities.export3D.filter(format => format !== 'step').map(format => format3DItems[format]),
+        ...stepItems,
+        ...(capabilities.export3D.includes('3mf') ? [
+          {
+            separator: true
           },
-        },
-        {
-          data: 'step-64-mt',
-          buttonLabel: 'Download STEP',
-          label: 'STEP via OCCT (64-bit multithreaded)',
-          icon: 'pi pi-server',
-          command: () => {
-            model!.setOcctStepExportArch('64-mt');
-            model!.setFormats(undefined, 'step');
-          },
-        },
-        {
-          separator: true
-        },
-        {
-          label: 'Edit materials' + ((state.params.extruderColors ?? []).length > 0 ? ` (${(state.params.extruderColors ?? []).length})` : ''),
-          icon: 'pi pi-cog',
-          command: () => model!.mutate(s => s.view.extruderPickerVisibility = 'editing'),
-        }
+          {
+            label: 'Edit materials' + ((state.params.extruderColors ?? []).length > 0 ? ` (${(state.params.extruderColors ?? []).length})` : ''),
+            icon: 'pi pi-cog',
+            command: () => model!.mutate(s => s.view.extruderPickerVisibility = 'editing'),
+          }
+        ] : []),
       ];
 
     const exportFormat = state.is2D ? state.params.exportFormat2D : state.params.exportFormat3D;
